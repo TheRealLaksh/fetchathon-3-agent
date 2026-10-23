@@ -1,0 +1,22 @@
+# secrets and local state
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# uAgents local storage
+*_data.json
+*.sqlite
+*.db
+
+# Claude Code local tooling
+.claude/settings.local.json
+.claude/worktrees/

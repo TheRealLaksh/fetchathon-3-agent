@@ -25,12 +25,15 @@ load_dotenv()
 SUBJECT = "the sun"
 client = OpenAI(base_url="https://api.asi1.ai/v1", api_key=os.environ["ASI1_API_KEY"])
 
+USE_MAILBOX = os.environ.get("USE_MAILBOX") == "1"
+
+# An explicit endpoint overrides the mailbox ("Endpoint configuration overrides mailbox
+# setting"), so only set it when NOT using the mailbox.
 agent = Agent(
     name="ASI-agent",
     seed=os.environ["AGENT_SEED_PHRASE"],
     port=8001,
-    endpoint=["http://127.0.0.1:8001/submit"],
-    mailbox=os.environ.get("USE_MAILBOX") == "1",
+    **({"mailbox": True} if USE_MAILBOX else {"endpoint": ["http://127.0.0.1:8001/submit"]}),
     publish_agent_details=True,
 )
 protocol = Protocol(spec=chat_protocol_spec)

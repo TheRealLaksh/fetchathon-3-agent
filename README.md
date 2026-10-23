@@ -28,6 +28,6 @@ Needs Python 3.10 to 3.13 (3.14 is not supported by uAgents yet).
 
 ## Extra resources
 
-- ASI:One API key: https://asi1.ai/dashboard/api-keys
+- ASI:One API key: https://asi1.ai/platform/developer
 - Agentverse API key: https://agentverse.ai/profile/api-keys
 - Docs: https://innovationlab.fetch.ai/resources/docs/intro

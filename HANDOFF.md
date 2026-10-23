@@ -61,15 +61,14 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `9638ac5` 2026-10-24 00:01 Add working Sun-expert chat agent template (ASI:One compatible)
 - `c8f0006` 2026-10-23 23:56 Add HANDOFF.md and its automation (stop hook, pre-commit refresh)
 - `fe9ea20` 2026-10-23 23:56 Add README with required badges, gitignore, env example and requirements
 
 ### Uncommitted changes at refresh time
 
 ```
-M .env.example
- M HANDOFF.md
- M README.md
-A  examples/sun_expert_agent.py
+M  .env.example
+M  README.md
 ```
 <!-- handoff:auto:end -->

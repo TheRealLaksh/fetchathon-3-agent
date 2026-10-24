@@ -91,6 +91,7 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `5af8f0d` 2026-10-24 16:09 Record README redesign in handoff
 - `8d4f549` 2026-10-24 16:08 README: branded architecture image instead of the mermaid diagram
 - `30ac115` 2026-10-24 16:07 README: agents as readable blocks instead of a wide table
 - `d8d6391` 2026-10-24 16:05 README: centered hero, at-a-glance block, answer image, architecture diagram, collapsible sections
@@ -105,11 +106,12 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
 - `ff9211f` 2026-10-24 14:57 Add geocode cache warm-up script
 - `14869f9` 2026-10-24 14:55 Fix reply wording for buyer mode and plural; record profile setup
-- `8a9ab14` 2026-10-24 14:52 Record end-to-end ASI:One success in handoff
 
 ### Uncommitted changes at refresh time
 
 ```
-M  HANDOFF.md
+M  docs/submission-checklist.md
+A  scripts/start-agents.ps1
+A  scripts/stop-agents.ps1
 ```
 <!-- handoff:auto:end -->

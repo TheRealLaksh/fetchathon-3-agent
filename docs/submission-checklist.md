@@ -34,7 +34,7 @@ Follow `docs/video-script.md` (about 4 minutes, limit 3 to 5). Ask the demo ques
 
 - [ ] README has both badges (`tag:innovationlab`, `tag:hackathon`), the agent table with names and addresses, and run instructions. Done.
 - [ ] Repo is public and has no `.env` or keys. Check with `git ls-files | grep -i env` (only `.env.example` should appear).
-- [ ] The three agent processes are running and stay running until the results are out. Keep the laptop plugged in with sleep turned off. To restart after a reboot: `powershell -ExecutionPolicy Bypass -File scripts\start-agents.ps1` (stop first with `scripts\stop-agents.ps1`). A restart cannot lose the Agentverse mailbox connection, but wait about a minute before asking a question.
+- [ ] The three agent processes are running and stay running until the results are out. Keep the laptop plugged in with sleep turned off. To restart after a reboot: `powershell -ExecutionPolicy Bypass -File scripts\start-agents.ps1` (stop first with `scripts\stop-agents.ps1`). The mailbox connection survived every restart today, but wait about a minute before asking a question and test once.
 - [ ] Do not restart the front agent after recording (it forgets the last ranking in memory).
 - [ ] Join the Fetch-A-Thon Discord and watch for any announcement about the submission form.
 

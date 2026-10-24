@@ -85,12 +85,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 4:09 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 4:10 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `61bba0c` 2026-10-24 16:09 Add start and stop scripts for the three agents
 - `5af8f0d` 2026-10-24 16:09 Record README redesign in handoff
 - `8d4f549` 2026-10-24 16:08 README: branded architecture image instead of the mermaid diagram
 - `30ac115` 2026-10-24 16:07 README: agents as readable blocks instead of a wide table
@@ -105,13 +106,10 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
 - `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
 - `ff9211f` 2026-10-24 14:57 Add geocode cache warm-up script
-- `14869f9` 2026-10-24 14:55 Fix reply wording for buyer mode and plural; record profile setup
 
 ### Uncommitted changes at refresh time
 
 ```
 M  docs/submission-checklist.md
-A  scripts/start-agents.ps1
-A  scripts/stop-agents.ps1
 ```
 <!-- handoff:auto:end -->

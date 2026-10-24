@@ -22,6 +22,7 @@ python <agent>.py
 Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat with Agent" in ASI:One. A mailbox agent only works while the script runs.
 
 ## Code map
+- `mandi/models.py`, `mandi/price_agent.py` (port 8002), `mandi/logistics_agent.py` (port 8003): the two real uAgents (agent-to-agent messages). Run each with `python -m mandi.price_agent` etc.; `python -m mandi.local_test` is a client that exercises both. TESTED 24 Oct: 23 real Haryana tomato rows, real road distances from Gurugram (Faridabad 37.8 km, Narnaul 111.6 km).
 - `mandi/core.py`: Mandi desk maths + data calls (data.gov.in prices, Nominatim geocode, OSRM route, `net_price`). Keyless parts tested live 24 Oct. Assumptions (truck rate, spoilage, commission) are labelled placeholders.
 - `README.md`: public README with the two required badges; agent name/address table to fill in.
 - `scripts/handoff.mjs`, `.githooks/pre-commit`, `.claude/settings.json`: HANDOFF.md automation.
@@ -43,7 +44,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - ASI:One key page is asi1.ai/platform/developer (docs link /dashboard/api-keys 404s). Key names allow only letters, numbers, spaces.
 
 ## Next steps (in order)
-0. MANDI DESK: data.gov.in key is in .env (done 24 Oct). Verified fresh rows dated 24/10/2026 for Tomato, Onion, Potato, Banana, Cauliflower (Tamil Nadu has most rows; Haryana/Punjab 12-24 each; Apple timed out once). Fields: arrival_date, commodity, district, grade, market, max_price, min_price, modal_price, state, variety. Next: build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
+0. MANDI DESK: data.gov.in key is in .env (done 24 Oct). Verified fresh rows dated 24/10/2026 for Tomato, Onion, Potato, Banana, Cauliflower (Tamil Nadu has most rows; Haryana/Punjab 12-24 each; Apple timed out once). Fields: arrival_date, commodity, district, grade, market, max_price, min_price, modal_price, state, variety. Next: front ASI:One agent (chat protocol) that calls both agents + net-price card + advisor; then build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
 1. Join Discord (channel Fetch-A-Thon 3.0) and agree roles with teammates.
 2. On the day: decide the project after the 10:15 brief, build from `examples/sun_expert_agent.py`, submit by 16:30 to 17:50 (GitHub repo, Agentverse profile URL(s), public ASI:One chat URL, 3 to 5 min video, write-up, via Devpost).
 3. Add the real agent's name/address to the README table; keep the two badges.
@@ -59,6 +60,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~15:00): built and tested Price + Logistics agents as separate processes (client test passes). Gotchas: Bureau did not fire handlers here, use separate processes with explicit endpoint; agent ctx.storage persists across runs (use in-memory flags in tests); python -u needed for logs when redirecting.
 - 2026-10-24 (~14:30): generated data.gov.in key in Laksh's logged-in Chrome (copied via clipboard to .env, never printed); confirmed fresh mandi rows for 5 crops; added retry to fetch_prices.
 - 2026-10-24 (~14:00): project locked (Mandi Net-Price Desk); added mandi/core.py (geocode, OSRM route, net-price maths) tested live without the data key.
 - 2026-10-24 (~01:00): Laksh confirmed the ASI:One -> agent chat works (screenshot); stopped the test agent; handoff updated.
@@ -69,12 +71,14 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 2:04 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 2:31 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
+- `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
 - `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
 - `a922855` 2026-10-24 00:30 Fix template: endpoint overrides mailbox, set only one
 - `6a322b4` 2026-10-24 00:01 Fix ASI:One API key URL and update handoff status
@@ -85,11 +89,10 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 ### Uncommitted changes at refresh time
 
 ```
-M  .env.example
-M  .gitignore
 M  HANDOFF.md
-A  mandi/__init__.py
-A  mandi/core.py
-M  requirements.txt
+A  mandi/local_test.py
+A  mandi/logistics_agent.py
+A  mandi/models.py
+A  mandi/price_agent.py
 ```
 <!-- handoff:auto:end -->

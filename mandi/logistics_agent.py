@@ -1,0 +1,57 @@
+"""Logistics agent: answers RouteRequest with real road distance and drive time (OSM + OSRM)."""
+import asyncio
+import os
+
+from dotenv import load_dotenv
+from uagents import Agent, Context
+
+from mandi.core import geocode, haversine_km, road_route
+from mandi.models import RouteInfo, RouteReply, RouteRequest
+
+load_dotenv()
+
+
+def _locate(place) -> tuple | None:
+    """Market first, then fall back to the district, so more rows get a position."""
+    return geocode(f"{place.market} mandi, {place.district}, {place.state}, India") or geocode(
+        f"{place.district}, {place.state}, India"
+    )
+
+
+def compute(req: RouteRequest) -> RouteReply:
+    origin = geocode(req.origin)
+    if not origin:
+        return RouteReply(origin=req.origin, origin_found=False, routes=[], error="Could not locate the origin")
+    routes, skipped = [], 0
+    for p in req.places:
+        pos = _locate(p)
+        if not pos or haversine_km(origin, pos) > req.max_radius_km:
+            skipped += 1
+            continue
+        leg = road_route(origin, pos)
+        if not leg:
+            skipped += 1
+            continue
+        routes.append(
+            RouteInfo(market=p.market, district=p.district, state=p.state, distance_km=leg[0], drive_hours=leg[1])
+        )
+    return RouteReply(origin=req.origin, origin_found=True, routes=routes, skipped=skipped)
+
+
+def make_logistics_agent(port: int = 8003, **kwargs) -> Agent:
+    agent = Agent(name="mandi-logistics-agent", seed=os.environ["AGENT_SEED_PHRASE"] + "-logistics", port=port, **kwargs)
+
+    @agent.on_message(RouteRequest, replies=RouteReply)
+    async def handle(ctx: Context, sender: str, msg: RouteRequest):
+        try:
+            reply = await asyncio.to_thread(compute, msg)
+        except Exception as err:
+            ctx.logger.exception("routing failed")
+            reply = RouteReply(origin=msg.origin, origin_found=False, routes=[], error=str(err)[:200])
+        await ctx.send(sender, reply)
+
+    return agent
+
+
+if __name__ == "__main__":
+    make_logistics_agent(endpoint=["http://127.0.0.1:8003/submit"]).run()

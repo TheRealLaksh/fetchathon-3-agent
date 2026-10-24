@@ -45,6 +45,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - ASI:One key page is asi1.ai/platform/developer (docs link /dashboard/api-keys 404s). Key names allow only letters, numbers, spaces.
 
 ## Next steps (in order)
+00. Agentverse profile: rename to Mandi Net-Price Desk + README/description; test buyer mode and other crops (onion, potato); tune Assumptions with real numbers; maybe Interactive Card; freeze 15:30; shared ASI:One chat URL; video; Devpost.
 0. MANDI DESK: data.gov.in key is in .env (done 24 Oct). Verified fresh rows dated 24/10/2026 for Tomato, Onion, Potato, Banana, Cauliflower (Tamil Nadu has most rows; Haryana/Punjab 12-24 each; Apple timed out once). Fields: arrival_date, commodity, district, grade, market, max_price, min_price, modal_price, state, variety. Next: front ASI:One agent (chat protocol) that calls both agents + net-price card + advisor; then build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
 1. Join Discord (channel Fetch-A-Thon 3.0) and agree roles with teammates.
 2. On the day: decide the project after the 10:15 brief, build from `examples/sun_expert_agent.py`, submit by 16:30 to 17:50 (GitHub repo, Agentverse profile URL(s), public ASI:One chat URL, 3 to 5 min video, write-up, via Devpost).
@@ -61,6 +62,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~14:55): END-TO-END IN ASI:ONE WORKS. Question sent from Laksh's ASI:One (profile chat of agent1qv7j...) -> mailbox -> front agent -> Price + Logistics agents -> ranked table with Sohna APMC best (Rs 2,443/qtl net). Needs all three processes running on the laptop (price, logistics, front with USE_MAILBOX=1). ASI:One still shows the old profile name 'ASI-agent': set name/description on the Agentverse agent profile. Nothing else changed in code.
 - 2026-10-24 (~14:50): built front agent (LLM intent extraction, calls Price + Logistics agents, ranks, replies); fixed geocode caching of failed lookups (only cache real answers) and the market-name cleaner; district-centre fallbacks are shown with ~. Gotcha: writing regex with backslash-b through a bash heredoc turned it into a backspace char; write it via a file using chr(92).
 - 2026-10-24 (~15:00): built and tested Price + Logistics agents as separate processes (client test passes). Gotchas: Bureau did not fire handlers here, use separate processes with explicit endpoint; agent ctx.storage persists across runs (use in-memory flags in tests); python -u needed for logs when redirecting.
 - 2026-10-24 (~14:30): generated data.gov.in key in Laksh's logged-in Chrome (copied via clipboard to .env, never printed); confirmed fresh mandi rows for 5 crops; added retry to fetch_prices.
@@ -73,12 +75,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 2:49 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 2:52 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `5551520` 2026-10-24 14:49 Add front ASI:One agent, net-price ranking and chat test; fix geocode caching
 - `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
 - `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
 - `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
@@ -93,11 +96,5 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ```
 M  HANDOFF.md
-A  mandi/chat_test.py
-M  mandi/core.py
-A  mandi/front_agent.py
-M  mandi/logistics_agent.py
-M  mandi/models.py
-A  mandi/ranking.py
 ```
 <!-- handoff:auto:end -->

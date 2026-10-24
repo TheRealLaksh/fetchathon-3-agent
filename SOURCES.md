@@ -19,6 +19,8 @@ similar share but do not reorder the mandis. Freight and transit loss only matte
 
 ## Links
 
+- Open-Meteo (free weather API, open-meteo.com): today's max/min temperature and rain chance, shown as returned. It is information only: it is not used in the net-price maths.
+
 - Business Standard, truck freight rates (CMIE): https://www.business-standard.com/industry/news/truck-freight-rates-dip-for-smaller-cities-remain-flat-for-bigger-ones-124050500187_1.html
 - FR8 truck rates: https://www.fr8.in/truck-rates
 - Tribune, Gurugram market fee and RDF: https://www.tribuneindia.com/news/haryana/arhtiyas-in-gurugram-fruit-and-vegetable-market-on-strike-589500

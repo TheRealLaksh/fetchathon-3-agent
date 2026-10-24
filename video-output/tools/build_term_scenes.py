@@ -90,15 +90,18 @@ run("09", [T("09"), RAW9B], [
 
 
 # scene 07: architecture image, front, price, logistics profiles, architecture again; boundaries from sentence lengths
+# price/logistics shots come from raw07b (retake after the helper profiles were branded); the rest from raw07
 RAW7 = os.path.join(CLIPS, "raw07.mp4")
+RAW7B = os.path.join(CLIPS, "raw07b.mp4")
 total = A("07") + LEAD
 b = [0, 5.4, 17.2, 21.6, 27.6, total]  # section boundaries in scene time
-arch0, front0, price0, logi0 = 88.96, 1.16, 35.4, 63.3
-run("07", [RAW7], [
+arch0, front0 = 88.96, 1.16
+price0, logi0 = 30.50, 1.20  # offsets inside raw07b
+run("07", [RAW7, RAW7B], [
     seg(0, arch0, arch0 + (b[1] - b[0]), 1, mask=True, tag="v0"),
     seg(0, front0, front0 + (b[2] - b[1]), 1, mask=True, tag="v1"),
-    seg(0, price0, price0 + (b[3] - b[2]), 1, mask=True, tag="v2"),
-    seg(0, logi0, logi0 + (b[4] - b[3]), 1, mask=True, tag="v3"),
+    seg(1, price0, price0 + (b[3] - b[2]), 1, mask=True, tag="v2"),
+    seg(1, logi0, logi0 + (b[4] - b[3]), 1, mask=True, tag="v3"),
     seg(0, arch0 + (b[1] - b[0]), arch0 + (b[1] - b[0]) + (b[5] - b[4]), 1, mask=True, tag="v4"),
     "[v0][v1][v2][v3][v4]concat=n=5:v=1:a=0[v]"
 ], "v", total)

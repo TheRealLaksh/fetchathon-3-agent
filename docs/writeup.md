@@ -28,11 +28,12 @@ Real example from 24 Oct 2026 (tomato, from Gurugram): Sohna, Gohana and Narnaul
 
 ## How we built it
 
-Three separate uAgents that exchange typed messages:
+Four separate uAgents that exchange typed messages:
 
 - **Mandi Net-Price Desk** (front agent, mailbox agent on Agentverse, Agent Chat Protocol). It uses the ASI1 LLM only to read the request, then orchestrates the others, ranks the results and replies.
 - **Price Agent**, which calls the data.gov.in daily mandi dataset.
 - **Logistics Agent**, which geocodes mandis with OpenStreetMap and gets road distance and drive time from OSRM.
+- **Weather Agent**, which returns today's real weather (temperature and rain chance, Open-Meteo) for the trader's place and the top mandis; shown next to the ranking, it does not change the maths.
 
 The ranking maths is deterministic code, not LLM output, so the numbers are repeatable and checked by 9 offline tests.
 
@@ -60,7 +61,7 @@ A working multi-agent workflow that answers a real money question using live gov
 
 - The agents run on a laptop; the mailbox agent only answers while they are running.
 - ASI:One takes 1 to 2 minutes to pass a message to the agent and needs a page reload to show the reply.
-- The interactive card renders in ASI:One; the "Plan this load" button was verified locally and in tests but not confirmed end to end inside ASI:One.
+- The interactive card renders in ASI:One and the "Plan this load" button was tested end to end there on 25 Oct 2026 (the plan came back, after about 6 minutes of mailbox delay that time).
 - Freight comes from long-haul rates; short hauls usually cost more per tonne-km.
 
 ## What is next

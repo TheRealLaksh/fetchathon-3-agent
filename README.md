@@ -10,7 +10,7 @@
 ![Python](https://img.shields.io/badge/python-3.10--3.13-1F6B4F?style=flat-square)
 ![uAgents](https://img.shields.io/badge/built%20with-uAgents-0F3D2E?style=flat-square)
 ![ASI:One](https://img.shields.io/badge/runs%20in-ASI%3AOne-F2B84B?style=flat-square&labelColor=0F3D2E)
-![Agentverse](https://img.shields.io/badge/agents-3%20on%20Agentverse-1F6B4F?style=flat-square)
+![Agentverse](https://img.shields.io/badge/agents-4%20on%20Agentverse-1F6B4F?style=flat-square)
 ![Tests](https://img.shields.io/badge/offline%20tests-9%20passing-1F6B4F?style=flat-square)
 
 [**Try it**](#try-it-in-asione) &nbsp;|&nbsp; [Agents](#agents) &nbsp;|&nbsp; [How it works](#how-it-works) &nbsp;|&nbsp; [Real data](#real-data-and-what-is-an-assumption) &nbsp;|&nbsp; [Test](#test-it) &nbsp;|&nbsp; [Run](#run-it-yourself) &nbsp;|&nbsp; [Limits](#known-limits)
@@ -39,7 +39,7 @@ One sentence in ASI:One. The agent pulls today's real prices and real road dista
 
 **What is different**
 
-Three cooperating agents, live government data, plain-code maths you can test, assumptions printed in every reply, and fallbacks when a data source is down.
+Four cooperating agents (front desk, prices, routes, weather), live government data, plain-code maths you can test, assumptions printed in every reply, and fallbacks when a data source is down.
 
 </td>
 </tr>
@@ -82,6 +82,7 @@ Open the agent in ASI:One and ask in plain language:
 | Agentverse profile, front agent | [Mandi Net-Price Desk](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile) |
 | Agentverse profile, Price Agent | [Mandi Price Agent](https://agentverse.ai/agents/details/agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0/profile) |
 | Agentverse profile, Logistics Agent | [Mandi Logistics Agent](https://agentverse.ai/agents/details/agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3/profile) |
+| Agentverse profile, Weather Agent | [Mandi Weather Agent](https://agentverse.ai/agents/details/agent1qdwntp8eujpl5cs5a808ygnyaedpdj4dvdlt9pc0qqwwwcshrcxcygjsvnt/profile) |
 
 ## Agents
 
@@ -109,7 +110,15 @@ Locates each mandi (OpenStreetMap) and returns real road distance and drive time
 agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3
 ```
 
-The front agent is a mailbox agent (reachable from ASI:One). The two helper agents run as local agents registered on Agentverse (their profile pages show Active and Local) and are called by the front agent over HTTP. The three are separate uAgents that exchange typed messages (`mandi/models.py`), so this is a real multi-agent workflow, not one agent calling functions. All three carry the Innovation Lab and hackathon badges in their Agentverse READMEs (`docs/agent-readme-*.md`).
+### 4. Mandi Weather Agent &nbsp;`helper`
+
+Returns today's real weather (max and min temperature, rain chance) for the trader's place and the top-ranked mandis' districts from Open-Meteo, shown next to the ranking. The weather does not change the ranking maths. [Agentverse profile](https://agentverse.ai/agents/details/agent1qdwntp8eujpl5cs5a808ygnyaedpdj4dvdlt9pc0qqwwwcshrcxcygjsvnt/profile)
+
+```
+agent1qdwntp8eujpl5cs5a808ygnyaedpdj4dvdlt9pc0qqwwwcshrcxcygjsvnt
+```
+
+The front agent is a mailbox agent (reachable from ASI:One). The three helper agents run as local agents registered on Agentverse (their profile pages show Active and Local) and are called by the front agent over HTTP. The four are separate uAgents that exchange typed messages (`mandi/models.py`), so this is a real multi-agent workflow, not one agent calling functions. All three carry the Innovation Lab and hackathon badges in their Agentverse READMEs (`docs/agent-readme-*.md`).
 
 ## How it works
 
@@ -117,16 +126,18 @@ The front agent is a mailbox agent (reachable from ASI:One). The two helper agen
 <img src="assets/architecture.png" alt="ASI:One chat to Agentverse mailbox to the front agent, which talks to the Price Agent and the Logistics Agent and replies with a table and an interactive card" width="95%">
 </div>
 
+The diagram predates the Weather Agent (added 25 Oct 2026), which the front agent calls in parallel with the explanation step.
+
 Fetch.ai pieces used: uAgents, Agentverse mailbox agent, Agent Chat Protocol, ASI1 LLM, agent-to-agent messages, ASI:One interactive card.
 
 ## What the hackpack asks for, and where it is
 
 | Requirement | Where |
 |---|---|
-| Register at least one agent on Agentverse | Three agents, each with an Agentverse profile (table above). The front agent is a mailbox agent. |
+| Register at least one agent on Agentverse | Four agents, each with an Agentverse profile (table above). The front agent is a mailbox agent. |
 | Agent Chat Protocol | Front agent, `mandi/front_agent.py`. |
 | Discoverable and usable in ASI:One | Open the profile link above in ASI:One, or mention the agent by address. Handle `@mandi-desk` is set on Agentverse. |
-| Meaningful tool use or multi-agent orchestration | Live data APIs plus three cooperating agents that exchange typed messages. |
+| Meaningful tool use or multi-agent orchestration | Live data APIs plus four cooperating agents that exchange typed messages. |
 | Whole primary workflow inside ASI:One | Question, ranked answer and card all happen in the ASI:One chat. No custom frontend. |
 | Public repo with run or test instructions | This README (Test it, Run it yourself). |
 
@@ -184,13 +195,14 @@ Fill in `.env` (never commit it):
 | `ASI1_API_KEY` | ASI1 model access | https://asi1.ai/platform/developer |
 | `AGENTVERSE_API_KEY` | connects the mailbox | https://agentverse.ai/profile/api-keys |
 | `DATA_GOV_IN_API_KEY` | mandi prices | free: sign up at https://www.data.gov.in, open the dataset "Current Daily Price of Various Commodities from Various Markets (Mandi)", API tab, Generate API Key |
-| `AGENT_SEED_PHRASE` | one long random string | make one up; the front agent derives the helper agents' addresses from it, so use the same value in all three processes. A new seed gives new addresses. |
+| `AGENT_SEED_PHRASE` | one long random string | make one up; the front agent derives the helper agents' addresses from it, so use the same value in all four processes. A new seed gives new addresses. |
 
-Start three processes, each in its own terminal, the front agent last:
+Start four processes, each in its own terminal, the front agent last:
 
 ```bash
 python -m mandi.price_agent
 python -m mandi.logistics_agent
+python -m mandi.weather_agent
 USE_MAILBOX=1 python -m mandi.front_agent
 ```
 
@@ -213,11 +225,11 @@ Pre-load the map cache so the first question about a crop or town is fast (run w
 > [!WARNING]
 > Please read these before judging the live demo.
 
-- The agents run on a laptop; the mailbox agent only answers while all three processes are running.
+- The agents run on a laptop; the mailbox agent only answers while all four processes are running.
 - First question for a crop or town not yet cached can take minutes (the free map lookup allows one request per second).
 - The government dataset holds only today's prices, so there is no trend or "wait and sell later" advice.
 - Agent commission is not included unless the user states it. Freight is derived from long-haul rates; short hauls usually cost more per tonne-km.
-- The interactive card renders in ASI:One. The "Plan this load" button flow was verified locally and in unit tests but not confirmed end to end inside ASI:One; typing "plan the load for <mandi>" is also handled.
+- The interactive card renders in ASI:One and its "Plan this load" button was tested end to end there on 25 Oct 2026: the tap reached the agent and the load plan came back, but after the mailbox delay it took about 6 minutes that time (typing "plan the load for <mandi>" is also handled).
 - Some mandis could only be located by district, so their distance is approximate and marked `~`.
 
 ## Repository
@@ -230,6 +242,7 @@ mandi/core.py            data calls, net-price maths, snapshots, fallbacks
 mandi/models.py          messages between the agents
 mandi/price_agent.py     Price Agent
 mandi/logistics_agent.py Logistics Agent
+mandi/weather_agent.py   Weather Agent (Open-Meteo)
 mandi/front_agent.py     ASI:One-facing agent
 mandi/ranking.py         ranking and reply text
 mandi/extras.py          interactive card and load planner

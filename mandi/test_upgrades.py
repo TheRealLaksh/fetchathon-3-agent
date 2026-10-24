@@ -9,9 +9,9 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from mandi import core, logistics_agent, personal
+from mandi import conditions, core, logistics_agent, personal, weather_agent
 from mandi.core import Assumptions
-from mandi.models import Place, RouteRequest
+from mandi.models import Place, RouteRequest, WeatherInfo, WeatherRequest
 from mandi.ranking import rank
 from mandi.selftest import fixture
 
@@ -114,6 +114,49 @@ def test_parallel_routing_keeps_order_and_counts_estimates():
     assert [r.market for r in rep.routes] == [f"M{i}" for i in range(8)]
     assert rep.estimated == 1 and rep.routes[3].approx and rep.routes[5].approx and not rep.routes[0].approx
     assert rep.skipped == 0
+
+
+def test_open_meteo_payload_is_parsed_and_junk_is_rejected():
+    payload = {"daily": {"time": ["2026-10-25"], "temperature_2m_max": [31.5], "temperature_2m_min": [20.5],
+                         "precipitation_probability_max": [4], "precipitation_sum": [0.0]}}
+    w = core.parse_weather(payload)
+    assert w == {"date": "2026-10-25", "max_c": 31.5, "min_c": 20.5, "rain_chance_pct": 4, "rain_mm": 0.0}
+    assert core.parse_weather({}) is None and core.parse_weather({"daily": {"time": []}}) is None
+
+
+def test_weather_line_uses_source_numbers_and_flags_rain_and_heat_only_when_true():
+    mild = WeatherInfo(place="A", found=True, max_c=31.5, min_c=20.5, rain_chance_pct=4, rain_mm=0)
+    wet = WeatherInfo(place="B", found=True, max_c=29.0, min_c=22.0, rain_chance_pct=80, rain_mm=12)
+    hot = WeatherInfo(place="C", found=True, max_c=39.0, min_c=27.0, rain_chance_pct=0, rain_mm=0)
+    gone = WeatherInfo(place="D", found=False)
+    line = conditions.weather_line([mild, wet, hot, gone], ["Gurugram", "Rohtak", "Jaipur", "Nowhere"])
+    assert "Gurugram 32°C" in line or "Gurugram 31°C" in line  # one decimal place of the source, shown as a whole number
+    assert "rain is likely around Rohtak (80%)" in line and "Jaipur is hot (39°C)" in line
+    assert "Nowhere" not in line and "does not change with the weather" in line
+    calm = conditions.weather_line([mild], ["Gurugram"])
+    assert "Take note" not in calm  # no warning when nothing warrants one
+    assert conditions.weather_line([gone], ["X"]) is None
+
+
+def test_agents_used_line_names_every_agent_and_is_honest_about_a_missing_one():
+    full = conditions.agents_used_line(30, 16, True, True)
+    assert "Price Agent (30 mandis" in full and "16 routes" in full and "Weather Agent (Open-Meteo)" in full
+    assert "writing the explanation" in full
+    partial = conditions.agents_used_line(30, 16, False, False)
+    assert "no answer this time" in partial and "writing the explanation" not in partial
+
+
+def test_weather_agent_geocodes_then_fetches_in_parallel_and_marks_missing_places():
+    def fake_geocode(q):
+        return None if q == "Nowhere" else (28.0 + len(q) / 100, 77.0)
+
+    def fake_weather(lat, lon):
+        return {"date": "2026-10-25", "max_c": 30.0, "min_c": 20.0, "rain_chance_pct": 10, "rain_mm": 0.0}
+
+    with mock.patch.object(weather_agent, "geocode", fake_geocode), mock.patch.object(weather_agent, "weather_today", fake_weather):
+        rep = weather_agent.compute(WeatherRequest(places=["Gurugram, Haryana", "Nowhere", "Rohtak, Haryana, India"]))
+    assert [i.place for i in rep.items] == ["Gurugram, Haryana", "Nowhere", "Rohtak, Haryana, India"]
+    assert [i.found for i in rep.items] == [True, False, True] and rep.items[0].max_c == 30.0 and rep.items[1].max_c is None
 
 
 if __name__ == "__main__":

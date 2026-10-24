@@ -144,6 +144,30 @@ def road_route(a: tuple, b: tuple) -> tuple[float, float] | None:
     return result
 
 
+def parse_weather(payload: dict) -> dict | None:
+    """Today's figures out of an Open-Meteo daily forecast, or None if the payload has no usable day."""
+    try:
+        d = payload["daily"]
+        return {"date": d["time"][0], "max_c": d["temperature_2m_max"][0], "min_c": d["temperature_2m_min"][0],
+                "rain_chance_pct": d["precipitation_probability_max"][0], "rain_mm": d["precipitation_sum"][0]}
+    except (KeyError, IndexError, TypeError):
+        return None
+
+
+def weather_today(lat: float, lon: float) -> dict | None:
+    """Today's max/min temperature and rain chance from Open-Meteo (free, no key). None if it is unreachable."""
+    try:
+        r = httpx.get(
+            "https://api.open-meteo.com/v1/forecast",
+            params={"latitude": round(lat, 3), "longitude": round(lon, 3), "timezone": "Asia/Kolkata", "forecast_days": 1,
+                    "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum"},
+            headers=UA, timeout=15)
+        r.raise_for_status()
+        return parse_weather(r.json())
+    except (httpx.HTTPError, ValueError):
+        return None
+
+
 def fetch_prices(commodity: str, state: str | None = None, limit: int = 200) -> list[dict]:
     """Latest published mandi rows for a commodity (optionally one state). Needs the API key."""
     key = os.environ["DATA_GOV_IN_API_KEY"]

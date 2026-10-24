@@ -109,12 +109,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 25 Oct 2026, 12:42 am IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 25 Oct 2026, 1:00 am IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `efe903a` 2026-10-25 00:42 Speed, memory, Hindi and a grounded explanation for the front agent
 - `a507393` 2026-10-24 23:50 Add screen-recorded demo video tooling, shotlist and handoff notes
 - `cd619e7` 2026-10-24 16:28 Add screen-recorded video brief (replaces the motion-graphics one)
 - `5e27d1b` 2026-10-24 16:24 README: list all three Agentverse profile links in the submission table
@@ -129,23 +130,26 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `1117198` 2026-10-24 15:47 Add submission docs: README, write-up, video script, checklist
 - `62ce375` 2026-10-24 15:44 Add profile picture and banner, log incoming messages, record card-tap findings
 - `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
-- `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
 
 ### Uncommitted changes at refresh time
 
 ```
-M  .gitignore
-M  HANDOFF.md
 M  README.md
+M  SOURCES.md
 M  docs/agent-readme-front.md
+A  docs/agent-readme-weather.md
 M  docs/writeup.md
+A  mandi/conditions.py
 M  mandi/core.py
 M  mandi/front_agent.py
-M  mandi/logistics_agent.py
-A  mandi/personal.py
+M  mandi/models.py
+M  mandi/personal.py
 M  mandi/ranking.py
-A  mandi/test_upgrades.py
+M  mandi/test_upgrades.py
+A  mandi/weather_agent.py
 M  scripts/start-agents.ps1
- M video-output/tools/build_term_scenes.py
+M  scripts/stop-agents.ps1
+A  scripts/watchdog.ps1
+M  video-output/tools/build_term_scenes.py
 ```
 <!-- handoff:auto:end -->

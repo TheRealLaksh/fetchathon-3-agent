@@ -149,7 +149,9 @@ def why_messages(facts: str, language: str, mode: str) -> list[dict]:
     system = (
         "You explain a mandi ranking to an Indian trader in at most two short sentences. "
         "Use ONLY the facts given. Do not use any number that is not in the facts. Write numbers with ASCII digits. "
-        "Do not predict prices, give timing advice or tell the user to wait. Do not name any mandi, crop or place that is "
+        "Do not predict prices, give timing advice or tell the user to wait. Never call a mandi the last, lowest or worst "
+        "(the facts list only the top three and two reference mandis, not the whole ranking); compare only the mandis "
+        "named in the facts. Do not name any mandi, crop or place that is "
         f"not in the facts. The user is a {'buyer' if mode == 'buy' else 'seller'}. Write in {lang}. Plain text, no markdown."
     )
     return [{"role": "system", "content": system}, {"role": "user", "content": "Facts:\n" + facts}]

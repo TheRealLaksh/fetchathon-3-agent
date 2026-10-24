@@ -26,9 +26,10 @@ from uagents_core.contrib.protocols.chat import (
 )
 
 from mandi.branding import profile_kwargs
+from mandi.conditions import agents_used_line, weather_line
 from mandi.core import Assumptions
 from mandi.extras import build_card_payload, card_message, find_tap, parse_selection, plan_load
-from mandi.models import Place, PriceReply, PriceRequest, RouteReply, RouteRequest
+from mandi.models import Place, PriceReply, PriceRequest, RouteReply, RouteRequest, WeatherReply, WeatherRequest
 from mandi.personal import (
     clean_language, facts_text, grounded, is_forget, memory_line, merge_request, remember, why_messages,
 )
@@ -45,6 +46,7 @@ for _stream in (sys.stdout, sys.stderr):
 SEED = os.environ["AGENT_SEED_PHRASE"]
 PRICE = Identity.from_seed(SEED + "-price", 0).address
 LOGISTICS = Identity.from_seed(SEED + "-logistics", 0).address
+WEATHER = Identity.from_seed(SEED + "-weather", 0).address
 USE_MAILBOX = os.environ.get("USE_MAILBOX") == "1"
 MAX_MARKETS = 30  # geocoding is rate-limited (1/s); results are cached on disk after the first run
 LAST: dict = {}  # sender -> last ranking, so a tap on a card button can be answered (lost on restart)
@@ -124,6 +126,18 @@ def _why_sync(results, mode: str, quintals, a, language: str) -> str | None:
                                     timeout=25)
     text = re.sub(r"\s+", " ", str(r.choices[0].message.content)).strip()
     return text if grounded(text, facts) else None  # a number or advice the data does not support: drop the line
+
+
+async def weather_for(ctx: Context, places: list[str]):
+    """Today's weather for the origin and the top mandis from the Weather Agent; None if it does not answer in time."""
+    try:
+        reply, _ = await ctx.send_and_receive(WEATHER, WeatherRequest(places=places), response_type=WeatherReply,
+                                              timeout=25)
+        if isinstance(reply, WeatherReply) and reply.items:
+            return reply.items
+    except Exception:
+        ctx.logger.warning("no weather this time", exc_info=True)
+    return None  # weather is a bonus; the ranking never waits on it
 
 
 async def explain(ctx: Context, results, mode: str, quintals, a, language: str) -> str | None:
@@ -224,8 +238,13 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
 
     results = rank(prices.rows, routes.routes, commodity, mode, a)
     qty = req.get("quantity_quintals") if isinstance(req.get("quantity_quintals"), (int, float)) else None
-    why = await explain(ctx, results, mode, qty, a, lang)
-    body = format_reply(results, commodity, origin, mode, qty, a, routes.skipped, why=why)
+    wx_places = [origin] + [f"{r.district}, {r.state}, India" for r in results[:2]]
+    wx_labels = [origin.split(",")[0].strip()] + [r.district for r in results[:2]]
+    why, wx_items = await asyncio.gather(explain(ctx, results, mode, qty, a, lang), weather_for(ctx, wx_places))
+    wx_line = weather_line(wx_items, wx_labels) if wx_items else None
+    body = format_reply(results, commodity, origin, mode, qty, a, routes.skipped, why=why,
+                        extras=[wx_line] if wx_line else None)
+    used = agents_used_line(len(places), len(routes.routes), bool(wx_line), bool(why))
     if prices.source == "snapshot":
         body += (f"\n_Live government prices were unreachable, so this uses the last saved snapshot "
                  f"({prices.fetched_at}). Treat it as possibly stale._")
@@ -239,11 +258,16 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         body += "\n" + note
     LAST[sender] = {"results": results, "quantity": qty, "quintals": qty, "a": a, "mode": mode}
     # Full table as a plain text message first, so the answer always arrives, then the interactive card.
-    await say(ctx, sender, body)
-    # ASI:One shows only the last message of a turn (the card), so the card's own text carries everything except the
-    # table (which the card repeats): recommendation, explanation, assumptions and the memory note.
-    card_text = re.sub(r"\n{3,}", "\n\n", "\n".join(ln for ln in body.splitlines() if not ln.startswith("|"))).strip()
-    await ctx.send(sender, card_message(card_text + "\n\nTap **Plan this load** on a mandi for trucks and totals.",
+    # Two messages with no overlap: the table first, then the card whose own text carries the recommendation, the
+    # explanation, the assumptions and the memory note. (A live ASI:One view shows only the last message of a turn;
+    # a reloaded or shared chat shows both.)
+    lines = body.splitlines()
+    table_rows = [i for i, ln in enumerate(lines) if ln.startswith("|")]
+    split = table_rows[-1] + 1 if table_rows else 0
+    if split:
+        await say(ctx, sender, "\n".join(lines[:split]).strip())
+    card_text = re.sub(r"\n{3,}", "\n\n", "\n".join(lines[split:])).strip()
+    await ctx.send(sender, card_message(card_text + "\n\n" + used + "\n\nTap **Plan this load** on a mandi for trucks and totals.",
                                         build_card_payload(results, commodity, origin, mode, qty)))
 
 

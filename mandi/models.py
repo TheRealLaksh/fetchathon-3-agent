@@ -57,3 +57,23 @@ class RouteReply(Model):
     skipped: int = 0  # places we could not locate or that were outside the radius
     estimated: int = 0  # routes estimated from straight-line distance because the routing service was down
     error: Optional[str] = None
+
+
+class WeatherRequest(Model):
+    places: List[str]  # free text, e.g. "Gurugram, Haryana" or "Rohtak, Haryana, India"
+
+
+class WeatherInfo(Model):
+    place: str
+    found: bool  # False when the place could not be located or the weather service did not answer
+    date: Optional[str] = None
+    max_c: Optional[float] = None
+    min_c: Optional[float] = None
+    rain_chance_pct: Optional[float] = None
+    rain_mm: Optional[float] = None
+
+
+class WeatherReply(Model):
+    items: List[WeatherInfo]
+    source: str = "Open-Meteo"
+    error: Optional[str] = None

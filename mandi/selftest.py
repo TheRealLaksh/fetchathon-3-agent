@@ -96,6 +96,24 @@ def test_plan_load():
     assert "assumed one full truck" in unknown
 
 
+def test_find_tap_json_and_prose():
+    rows, routes = fixture()
+    a = Assumptions()
+    res = rank(rows, routes, "tomato", "sell", a)
+    last = {"results": res}
+    j = extras.selection_for(res[1], 1, "Tomato", "Gurugram, Haryana", "sell", 80)
+    assert extras.find_tap(json.dumps(j), last) == 1
+    prose = f"The user selected Plan this load for {res[2].market} in {res[2].district}."
+    assert extras.find_tap(prose, last) == 2
+    assert extras.find_tap("I have 8 tonnes of tomato in Gurugram", last) is None  # no selection word
+    assert extras.find_tap("Where should I sell? Near APMC or Far APMC, I picked both", last) is None  # ambiguous
+    assert extras.find_tap(prose, None) is None
+    typed = f"plan the load for {res[1].market}"
+    assert extras.find_tap(typed, last) == 1  # a typed request works without the card
+    stale = dict(j, market="Gone APMC")
+    assert extras.find_tap(json.dumps(stale), last) is None
+
+
 def test_snapshot_fallback():
     with tempfile.TemporaryDirectory() as tmp, mock.patch.object(core, "SNAPSHOT_DIR", Path(tmp)):
         live = [{"state": "Haryana", "market": "M"}, {"state": "Punjab", "market": "N"}]

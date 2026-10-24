@@ -1,6 +1,7 @@
 """Interactive card and load planner for the Mandi desk. Pure functions, no network."""
 import json
 import math
+import re
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -78,6 +79,27 @@ def parse_selection(text: str) -> dict | None:
     except (ValueError, TypeError):
         return None
     return data if isinstance(data, dict) and data.get("action") == "plan_load" else None
+
+
+def find_tap(text: str, last: dict | None) -> int | None:
+    """Index into the last ranking for a 'Plan this load' tap, or None if the text is not a tap.
+
+    Direct @mention: the selection arrives as JSON. Planner-mediated: ASI:One summarises it in prose
+    that names the mandi, so match a market name from the last ranking next to a selection word.
+    """
+    if not last:
+        return None
+    results = last["results"]
+    sel = parse_selection(text)
+    if sel:
+        idx = sel.get("rank")
+        ok = isinstance(idx, int) and 0 <= idx < len(results) and results[idx].market == sel.get("market")
+        return idx if ok else None
+    low = text.lower()
+    if not re.search(r"plan (this|the|my) load|plan load|load plan|plan_load|selected|picked|chose|choose|tapped|clicked", low):
+        return None
+    hits = [i for i, r in enumerate(results) if r.market.lower() in low]
+    return hits[0] if len(hits) == 1 else None
 
 
 def plan_load(results: list[Result], chosen: int, quintals: float | None, a: Assumptions, mode: str,

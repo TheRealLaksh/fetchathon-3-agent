@@ -25,7 +25,7 @@ from uagents_core.contrib.protocols.chat import (
 )
 
 from mandi.core import Assumptions
-from mandi.extras import build_card_payload, card_message, parse_selection, plan_load
+from mandi.extras import build_card_payload, card_message, find_tap, parse_selection, plan_load
 from mandi.models import Place, PriceReply, PriceRequest, RouteReply, RouteRequest
 from mandi.ranking import ADJACENT, format_reply, rank, search_states
 
@@ -95,17 +95,15 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     await ctx.send(sender, ChatAcknowledgement(acknowledged_msg_id=msg.msg_id))
     text = "".join(i.text for i in msg.content if isinstance(i, TextContent)).strip()
 
-    sel = parse_selection(text)  # a tap on a card's "Plan this load" button
-    if sel:
-        last = LAST.get(sender)
-        idx = sel.get("rank")
-        if (last and isinstance(idx, int) and 0 <= idx < len(last["results"])
-                and last["results"][idx].market == sel.get("market")):
-            await say(ctx, sender, plan_load(last["results"], idx, last["quintals"], last["a"], last["mode"]),
-                      end=True)
-        else:
-            await say(ctx, sender, "That list has expired. Ask me again, for example: "
-                                   "*I have 8 tonnes of tomato in Gurugram. Where should I sell today?*", end=True)
+    last = LAST.get(sender)
+    tapped = find_tap(text, last)  # a tap on a card's "Plan this load" button (JSON, or ASI:One's prose summary)
+    if tapped is not None:
+        await say(ctx, sender, plan_load(last["results"], tapped, last["quintals"], last["a"], last["mode"]),
+                  end=True)
+        return
+    if parse_selection(text):  # a card tap whose list we no longer hold (agent restarted)
+        await say(ctx, sender, "That list has expired. Ask me again, for example: "
+                               "*I have 8 tonnes of tomato in Gurugram. Where should I sell today?*", end=True)
         return
 
     try:
@@ -171,8 +169,9 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         body += (f"\n_The routing service was unreachable for {routes.estimated} markets, so their distances "
                  "are straight-line estimates._")
     LAST[sender] = {"results": results, "quantity": qty, "quintals": qty, "a": a, "mode": mode}
-    # Full table as text (also the fallback if a client cannot draw cards), plus the interactive card.
-    await ctx.send(sender, card_message(body + "\n\nTap **Plan this load** on a mandi below for trucks and totals.",
+    # Full table as a plain text message first, so the answer always arrives, then the interactive card.
+    await say(ctx, sender, body)
+    await ctx.send(sender, card_message("Tap **Plan this load** on a mandi for trucks and totals.",
                                         build_card_payload(results, commodity, origin, mode, qty)))
 
 

@@ -63,6 +63,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~15:30): added offline fallbacks (saved price snapshot, estimated routes), interactive card (custom card, "Plan this load" button per mandi), load planner (trucks, totals, optional spread across top 3), 9 offline self-tests (python -m mandi.selftest). VERIFIED: card renders in ASI:One; snapshot fallback works with a wrong API key; JSON card tap -> plan works locally (TAP=2 chat_test). NOT CONFIRMED: tapping the card in the ASI:One UI did not produce a plan within ~3 min (tap goes to ASI:One's planner, 'Submitted' shown, agent log shows nothing). Typed 'plan the load for <mandi>' is handled instead. 'Sell now vs wait' NOT built: data.gov.in API returns only today's rows (date filter ignored, verified), so no history; dated snapshots now accumulate in mandi/snapshots/ (gitignored). ASI:One chat view needs a page reload to show new agent messages (UI quirk).
 - 2026-10-24 (~16:15): assumptions now sourced (SOURCES.md): freight Rs 3.0/tonne-km, market fee 2% (Haryana 1%+1% RDF), agent commission 0% (not included, no reliable rate), transit loss 0.25/0.15/0.2 %/h (tomato/onion/other, derived from NABCONS 2022). Users can override in chat (truck rate, commission, market fee). Ranking order is insensitive to these (tested). Front agent restarted with mailbox on the new code. Unverified at primary source: NABCONS crop-by-stage tables, current Haryana commission schedule.
 - 2026-10-24 (~15:50): ran warm_cache for Tomato/Onion/Potato from Gurugram + Delhi (117 cache entries; file is gitignored, lives only on this laptop). A warm tomato question now answers in ~30 s including the test client start-up (was minutes cold). Potato, off-topic and onion buy/sell tests all passed.
 - 2026-10-24 (~15:35): Agentverse starter prompts added; onion (sell) test OK but took minutes on a cold cache; added warm_cache.py. Potato + off-topic tests were still running.
@@ -80,12 +81,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:11 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:27 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
 - `4d33d2c` 2026-10-24 15:11 Add offline fallbacks: saved price snapshot and estimated routes
 - `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
 - `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
@@ -100,13 +102,14 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `a922855` 2026-10-24 00:30 Fix template: endpoint overrides mailbox, set only one
 - `6a322b4` 2026-10-24 00:01 Fix ASI:One API key URL and update handoff status
 - `9638ac5` 2026-10-24 00:01 Add working Sun-expert chat agent template (ASI:One compatible)
-- `c8f0006` 2026-10-23 23:56 Add HANDOFF.md and its automation (stop hook, pre-commit refresh)
 
 ### Uncommitted changes at refresh time
 
 ```
-A  mandi/extras.py
+M  HANDOFF.md
+M  mandi/chat_test.py
+M  mandi/extras.py
 M  mandi/front_agent.py
-A  mandi/selftest.py
+M  mandi/selftest.py
 ```
 <!-- handoff:auto:end -->

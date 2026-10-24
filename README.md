@@ -79,7 +79,9 @@ Open the agent in ASI:One and ask in plain language:
 | Public ASI:One shared chat | _to be added before submission_ |
 | Demo video (3 to 5 min) | _to be added before submission_ |
 | Write-up | [docs/writeup.md](docs/writeup.md) |
-| Agentverse profiles | in the Agents table below |
+| Agentverse profile, front agent | [Mandi Net-Price Desk](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile) |
+| Agentverse profile, Price Agent | [Mandi Price Agent](https://agentverse.ai/agents/details/agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0/profile) |
+| Agentverse profile, Logistics Agent | [Mandi Logistics Agent](https://agentverse.ai/agents/details/agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3/profile) |
 
 ## Agents
 

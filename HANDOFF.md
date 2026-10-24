@@ -63,6 +63,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~16:15): assumptions now sourced (SOURCES.md): freight Rs 3.0/tonne-km, market fee 2% (Haryana 1%+1% RDF), agent commission 0% (not included, no reliable rate), transit loss 0.25/0.15/0.2 %/h (tomato/onion/other, derived from NABCONS 2022). Users can override in chat (truck rate, commission, market fee). Ranking order is insensitive to these (tested). Front agent restarted with mailbox on the new code. Unverified at primary source: NABCONS crop-by-stage tables, current Haryana commission schedule.
 - 2026-10-24 (~15:50): ran warm_cache for Tomato/Onion/Potato from Gurugram + Delhi (117 cache entries; file is gitignored, lives only on this laptop). A warm tomato question now answers in ~30 s including the test client start-up (was minutes cold). Potato, off-topic and onion buy/sell tests all passed.
 - 2026-10-24 (~15:35): Agentverse starter prompts added; onion (sell) test OK but took minutes on a cold cache; added warm_cache.py. Potato + off-topic tests were still running.
 - 2026-10-24 (~15:20): Agentverse profile set (name Mandi Net-Price Desk, 160-char description, README); buyer mode tested OK (onion, Delhi); reply wording fixed. KNOWN RISK: a cold geocode cache makes the first query for a new crop/area take minutes (Nominatim 1 req/s) -> PRE-WARM the cache before the demo and before judging.
@@ -79,12 +80,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:02 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:07 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
 - `ff9211f` 2026-10-24 14:57 Add geocode cache warm-up script
 - `14869f9` 2026-10-24 14:55 Fix reply wording for buyer mode and plural; record profile setup
 - `8a9ab14` 2026-10-24 14:52 Record end-to-end ASI:One success in handoff
@@ -103,5 +105,9 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ```
 M  HANDOFF.md
+A  SOURCES.md
+M  mandi/core.py
+M  mandi/front_agent.py
+M  mandi/ranking.py
 ```
 <!-- handoff:auto:end -->

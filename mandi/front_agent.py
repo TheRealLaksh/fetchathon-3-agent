@@ -41,13 +41,16 @@ STATE_NAMES = ", ".join(sorted(set(ADJACENT) | {s for v in ADJACENT.values() for
 
 EXTRACT_PROMPT = f"""You read a message from a produce trader in India and return ONLY a JSON object, no prose:
 {{"intent": "sell" | "buy" | "other", "commodity": string|null, "origin": string|null,
-  "origin_state": string|null, "quantity_quintals": number|null}}
+  "origin_state": string|null, "quantity_quintals": number|null,
+  "truck_rate_rs_per_tonne_km": number|null, "commission_pct": number|null, "market_fee_pct": number|null}}
 - intent: sell = they have produce and want the best mandi to sell at; buy = they want the cheapest mandi to source from;
   other = not about mandi prices.
 - commodity: singular English name in Title Case, e.g. Tomato, Onion, Potato, Banana, Cauliflower.
 - origin: the city or town the produce is in or the buyer is in, e.g. "Gurugram, Haryana".
 - origin_state: that place's state, spelled exactly as one of: {STATE_NAMES}.
 - quantity_quintals: 1 tonne = 10 quintals; null if not given.
+- truck_rate_rs_per_tonne_km, commission_pct, market_fee_pct: only if the user states their own freight rate
+  (Rs per tonne per km), agent commission (%) or market fee (%); otherwise null.
 Use null for anything not stated. Do not guess the crop or the place."""
 
 HELP = (
@@ -129,6 +132,11 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     places = places[:MAX_MARKETS]
 
     a = Assumptions()
+    for field_name, lo, hi in (("truck_rate_rs_per_tonne_km", 0.5, 20.0), ("commission_pct", 0.0, 30.0),
+                               ("market_fee_pct", 0.0, 15.0)):
+        v = req.get(field_name)
+        if isinstance(v, (int, float)) and lo <= v <= hi:  # ignore absurd values the user or LLM may give
+            setattr(a, field_name, float(v))
     routes, _ = await ctx.send_and_receive(
         LOGISTICS, RouteRequest(origin=origin, places=places, max_radius_km=a.max_radius_km),
         response_type=RouteReply, timeout=300)

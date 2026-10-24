@@ -114,8 +114,10 @@ def format_reply(results: list[Result], commodity: str, origin: str, mode: str, 
                      f"is a difference of about Rs {gain:,.0f}.")
     lines.append(
         f"\n_Prices: data.gov.in daily mandi data dated {best.arrival_date} (mean of today's varieties per mandi). "
-        f"Distances: real road routes (OpenStreetMap/OSRM). Assumptions you can change: truck Rs "
-        f"{a.truck_rate_rs_per_tonne_km:g} per tonne-km, mandi commission {a.commission_pct:g}%, spoilage "
+        f"Distances: real road routes (OpenStreetMap/OSRM). Assumptions (tell me to change any): truck Rs "
+        f"{a.truck_rate_rs_per_tonne_km:g} per tonne-km (long-haul market range Rs 2.8 to 3.7), mandi fee "
+        f"{a.market_fee_pct:g}% (Haryana market fee plus RDF), agent commission {a.commission_pct:g}% "
+        f"({'included' if a.commission_pct else 'not included, tell me yours'}), transit loss "
         f"{a.spoilage_pct_per_hour.get(commodity.lower(), a.spoilage_pct_per_hour['default']):g}% of value per drive hour._")
     if any(r.approx for r in results[:top]):
         lines.append("_~ means the mandi's exact spot was not found, so the district centre was used (distance approximate)._")

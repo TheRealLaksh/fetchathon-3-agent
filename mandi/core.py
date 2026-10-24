@@ -20,11 +20,20 @@ GEO_CACHE = Path(__file__).with_name("geocache.json")
 
 @dataclass
 class Assumptions:
-    """Editable and shown on every answer. Defaults are placeholders to tune, not facts."""
+    """Editable and shown on every answer. Sources are listed in SOURCES.md."""
 
-    truck_rate_rs_per_tonne_km: float = 3.0  # ASSUMPTION: tune with a real freight quote
-    commission_pct: float = 2.0  # ASSUMPTION: mandi commission and fees
-    spoilage_pct_per_hour: dict = field(default_factory=lambda: {"default": 0.2})  # ASSUMPTION per crop
+    # Freight: Rs 2.8-3.7 per tonne-km on long hauls (Business Standard/CMIE Apr 2024 per-km rates for
+    # a 15 t truck; FR8 route quotes). Median ~3.0. Short hauls usually cost more per tonne-km.
+    truck_rate_rs_per_tonne_km: float = 3.0
+    # Haryana fruit/vegetable market fee 1% + Rural Development Fund 1% (Tribune, Feb 2024).
+    market_fee_pct: float = 2.0
+    # Arhtiya (commission agent) commission: no reliable single rate found, varies by state, crop and
+    # who pays, so it is NOT included unless the user states one.
+    commission_pct: float = 0.0
+    # Transit loss as % of value per drive hour. Anchored to NABCONS 2022 (via Lok Sabha answer):
+    # vegetable transport loss about 0.1-1.6% per trip, i.e. ~0.2%/h over a ~5 h trip. Tomato and onion
+    # are scaled by their market-stage losses (3.25% vs 1.96%, NABCONS 2022). Potato: no crop figure, default.
+    spoilage_pct_per_hour: dict = field(default_factory=lambda: {"tomato": 0.25, "onion": 0.15, "default": 0.2})
     max_radius_km: float = 300.0
 
 
@@ -116,5 +125,5 @@ def net_price(modal: float, distance_km: float, drive_hours: float, commodity: s
     transport = a.truck_rate_rs_per_tonne_km * distance_km / 10.0  # 1 quintal = 0.1 tonne
     spoil_pct = a.spoilage_pct_per_hour.get(commodity.lower(), a.spoilage_pct_per_hour["default"]) * drive_hours
     spoilage = modal * spoil_pct / 100.0
-    fees = modal * a.commission_pct / 100.0
+    fees = modal * (a.market_fee_pct + a.commission_pct) / 100.0
     return transport, spoilage, fees, modal - transport - spoilage - fees

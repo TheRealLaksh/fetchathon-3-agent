@@ -111,16 +111,9 @@ The front agent is a mailbox agent (reachable from ASI:One). The two helper agen
 
 ## How it works
 
-```mermaid
-flowchart LR
-    U["ASI:One chat"] --> MB["Agentverse mailbox"]
-    MB --> F["Mandi Net-Price Desk<br/>front agent"]
-    F -- "read the request" --> LLM["ASI1 model"]
-    F <--> P["Price Agent<br/>data.gov.in daily prices"]
-    F <--> L["Logistics Agent<br/>OpenStreetMap + OSRM routes"]
-    F --> R["Ranking and load plan<br/>plain code"]
-    R --> OUT["Table + interactive card<br/>back to ASI:One"]
-```
+<div align="center">
+<img src="assets/architecture.png" alt="ASI:One chat to Agentverse mailbox to the front agent, which talks to the Price Agent and the Logistics Agent and replies with a table and an interactive card" width="95%">
+</div>
 
 Fetch.ai pieces used: uAgents, Agentverse mailbox agent, Agent Chat Protocol, ASI1 LLM, agent-to-agent messages, ASI:One interactive card.
 

@@ -20,3 +20,4 @@ __pycache__/
 # Claude Code local tooling
 .claude/settings.local.json
 .claude/worktrees/
+mandi/geocache.json

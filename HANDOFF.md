@@ -1,7 +1,7 @@
 # HANDOFF: Fetch-A-Thon 3.0 agent
 
 ## Project in one paragraph
-Laksh Pradhwani's entry for Fetch-A-Thon 3.0 (Fetch.ai Innovation Lab x Masters' Union, Sat 24 Oct 2026, Masters' Union Gurugram, build 10:30 to ~17:50). Build an AI agent registered on Agentverse, speaking the Agent Chat Protocol, discoverable and fully usable inside an ASI:One chat, doing real multi-step tool use. Team ID fetchathon3.0-5865, Laksh is lead. The project idea is **not decided**: Laksh picks it on the day after the 10:15 challenge brief.
+Laksh Pradhwani's entry for Fetch-A-Thon 3.0 (Fetch.ai Innovation Lab x Masters' Union, Sat 24 Oct 2026, Masters' Union Gurugram, build 10:30 to ~17:50). Build an AI agent registered on Agentverse, speaking the Agent Chat Protocol, discoverable and fully usable inside an ASI:One chat, doing real multi-step tool use. Team ID fetchathon3.0-5865, Laksh is lead. **Project chosen 24 Oct 2026 (~14:00): Mandi Net-Price Desk** (Laksh picked it himself from 3 options): an ASI:One multi-agent desk that ranks mandis by NET rupees per quintal (live data.gov.in price minus real OSRM transport, spoilage and fees).
 
 ## Links
 - Local path: `C:\dev\fetchathon-3` · reference examples (read-only clone): `C:\dev\fetchathon-ref`
@@ -22,6 +22,7 @@ python <agent>.py
 Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat with Agent" in ASI:One. A mailbox agent only works while the script runs.
 
 ## Code map
+- `mandi/core.py`: Mandi desk maths + data calls (data.gov.in prices, Nominatim geocode, OSRM route, `net_price`). Keyless parts tested live 24 Oct. Assumptions (truck rate, spoilage, commission) are labelled placeholders.
 - `README.md`: public README with the two required badges; agent name/address table to fill in.
 - `scripts/handoff.mjs`, `.githooks/pre-commit`, `.claude/settings.json`: HANDOFF.md automation.
 - `examples/sun_expert_agent.py`: working ASI:One-compatible chat agent template (ACK, ASI1 call, reply). Copy it to start the real agent.
@@ -42,6 +43,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - ASI:One key page is asi1.ai/platform/developer (docs link /dashboard/api-keys 404s). Key names allow only letters, numbers, spaces.
 
 ## Next steps (in order)
+0. MANDI DESK: Laksh gets a free data.gov.in API key (DATA_GOV_IN_API_KEY in .env; the shared sample key is rate-limited); confirm which crops have fresh rows; build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
 1. Join Discord (channel Fetch-A-Thon 3.0) and agree roles with teammates.
 2. On the day: decide the project after the 10:15 brief, build from `examples/sun_expert_agent.py`, submit by 16:30 to 17:50 (GitHub repo, Agentverse profile URL(s), public ASI:One chat URL, 3 to 5 min video, write-up, via Devpost).
 3. Add the real agent's name/address to the README table; keep the two badges.
@@ -57,6 +59,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~14:00): project locked (Mandi Net-Price Desk); added mandi/core.py (geocode, OSRM route, net-price maths) tested live without the data key.
 - 2026-10-24 (~01:00): Laksh confirmed the ASI:One -> agent chat works (screenshot); stopped the test agent; handoff updated.
 - 2026-10-24 (00:30 to 01:10): created Agentverse key into `.env`; fixed template (endpoint vs mailbox); connected mailbox via `/connect`; agent shows Active + ASI Available on Agentverse. ASI:One chat test blocked by signed-out ASI:One in the automation browser.
 - 2026-10-24 (just after midnight): created ASI:One key into `.env`, verified; ran Sun-expert example locally end to end; added `examples/sun_expert_agent.py`; fixed the key URL (asi1.ai/platform/developer). Agentverse login still needed.
@@ -65,12 +68,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 12:52 am IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 2:04 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
 - `a922855` 2026-10-24 00:30 Fix template: endpoint overrides mailbox, set only one
 - `6a322b4` 2026-10-24 00:01 Fix ASI:One API key URL and update handoff status
 - `9638ac5` 2026-10-24 00:01 Add working Sun-expert chat agent template (ASI:One compatible)
@@ -80,6 +84,11 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 ### Uncommitted changes at refresh time
 
 ```
+M  .env.example
+M  .gitignore
 M  HANDOFF.md
+A  mandi/__init__.py
+A  mandi/core.py
+M  requirements.txt
 ```
 <!-- handoff:auto:end -->

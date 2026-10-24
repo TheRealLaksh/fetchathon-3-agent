@@ -63,6 +63,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~15:58): README reviewed against the hackpack and rewritten (submission links table, requirements map, bonus map, test-without-keys, key sources, mailbox connect steps, extra resources). FOUND: Agentverse agent READMEs lacked the Innovation Lab badges -> added docs/agent-readme-{front,price,logistics}.md + mandi/branding.py (readme, description, avatar, banner published from code). For a mailbox agent the profile is only pushed on /connect: re-ran POST /connect (key from .env); this REPLACED the hand-typed README (now badges render) and CLEARED starter prompts (re-added by hand). Agents restarted; end-to-end still works. NOTE: after any front-agent re-connect, re-add starter prompts. Helper agents' Agentverse profiles not re-checked after restart.
 - 2026-10-24 (~16:00): SUBMISSION DOCS written: README (agent table, how it works, run steps, limits), docs/writeup.md (Devpost text), docs/video-script.md (4 min script + pre-flight), docs/submission-checklist.md. STILL TO DO BY LAKSH: share the ASI:One chat publicly (his browser) and paste link; record + upload video; fill Devpost form; keep the three agent processes running.
 - 2026-10-24 (~15:50): Agentverse profile finished: avatar (assets/pfp.png) + banner (assets/banner.png) uploaded, handle @mandi-desk set, setup checklist complete. ASI:One still shows the old name/avatar 'ASI-agent' (its own cache; check again later). CARD TAP FINDINGS: ASI:One -> mailbox -> agent delivery takes ~1.5 min each way and the chat page needs a reload (20-90 s) to show replies, so an earlier 'tap did nothing' was probably me restarting the agent before the tap arrived (LAST list is in memory and lost on restart). Do NOT restart the front agent while testing. A tap in a chat whose 'To' is the ASI:One assistant may be routed to it instead of our agent (unconfirmed). After many reloads ASI:One showed a Loading screen with a reCAPTCHA (bot check): stop automated reloads; test the tap by hand. The agent logs every incoming message text ('incoming from ...') so the tap format can be read from the log.
 - 2026-10-24 (~15:30): added offline fallbacks (saved price snapshot, estimated routes), interactive card (custom card, "Plan this load" button per mandi), load planner (trucks, totals, optional spread across top 3), 9 offline self-tests (python -m mandi.selftest). VERIFIED: card renders in ASI:One; snapshot fallback works with a wrong API key; JSON card tap -> plan works locally (TAP=2 chat_test). NOT CONFIRMED: tapping the card in the ASI:One UI did not produce a plan within ~3 min (tap goes to ASI:One's planner, 'Submitted' shown, agent log shows nothing). Typed 'plan the load for <mandi>' is handled instead. 'Sell now vs wait' NOT built: data.gov.in API returns only today's rows (date filter ignored, verified), so no history; dated snapshots now accumulate in mandi/snapshots/ (gitignored). ASI:One chat view needs a page reload to show new agent messages (UI quirk).
@@ -83,12 +84,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:50 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:56 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `8c8da6f` 2026-10-24 15:50 Add detailed video brief for the /brag session
 - `1117198` 2026-10-24 15:47 Add submission docs: README, write-up, video script, checklist
 - `62ce375` 2026-10-24 15:44 Add profile picture and banner, log incoming messages, record card-tap findings
 - `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
@@ -103,12 +105,18 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
 - `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
 - `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
-- `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
 
 ### Uncommitted changes at refresh time
 
 ```
-M  .gitignore
-A  docs/video-brag-prompt.md
+M  HANDOFF.md
+M  README.md
+A  docs/agent-readme-front.md
+A  docs/agent-readme-logistics.md
+A  docs/agent-readme-price.md
+A  mandi/branding.py
+M  mandi/front_agent.py
+M  mandi/logistics_agent.py
+M  mandi/price_agent.py
 ```
 <!-- handoff:auto:end -->

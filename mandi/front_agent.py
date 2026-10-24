@@ -24,6 +24,7 @@ from uagents_core.contrib.protocols.chat import (
     chat_protocol_spec,
 )
 
+from mandi.branding import profile_kwargs
 from mandi.core import Assumptions
 from mandi.extras import build_card_payload, card_message, find_tap, parse_selection, plan_load
 from mandi.models import Place, PriceReply, PriceRequest, RouteReply, RouteRequest
@@ -68,6 +69,11 @@ agent = Agent(
     port=8001,
     **({"mailbox": True} if USE_MAILBOX else {"endpoint": ["http://127.0.0.1:8001/submit"]}),
     publish_agent_details=True,
+    **profile_kwargs(
+        "agent-readme-front.md",
+        "Ranks Indian mandis by net Rs per quintal after real road freight, spoilage and fees, using today's "
+        "government prices. For sellers and buyers.",
+    ),
 )
 protocol = Protocol(spec=chat_protocol_spec)
 

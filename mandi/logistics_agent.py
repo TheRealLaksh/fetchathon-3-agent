@@ -6,6 +6,7 @@ import re
 from dotenv import load_dotenv
 from uagents import Agent, Context
 
+from mandi.branding import profile_kwargs
 from mandi.core import estimate_route, geocode, haversine_km, road_route
 from mandi.models import RouteInfo, RouteReply, RouteRequest
 
@@ -56,7 +57,15 @@ def compute(req: RouteRequest) -> RouteReply:
 
 
 def make_logistics_agent(port: int = 8003, **kwargs) -> Agent:
-    agent = Agent(name="mandi-logistics-agent", seed=os.environ["AGENT_SEED_PHRASE"] + "-logistics", port=port, **kwargs)
+    agent = Agent(
+        name="Mandi Logistics Agent", seed=os.environ["AGENT_SEED_PHRASE"] + "-logistics", port=port,
+        **profile_kwargs(
+            "agent-readme-logistics.md",
+            "Locates mandis with OpenStreetMap and returns real road distance and drive time from OSRM. "
+            "Part of Mandi Net-Price Desk.",
+        ),
+        **kwargs,
+    )
 
     @agent.on_message(RouteRequest, replies=RouteReply)
     async def handle(ctx: Context, sender: str, msg: RouteRequest):

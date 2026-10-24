@@ -5,24 +5,50 @@
 
 ![Mandi Net-Price Desk](assets/banner.png)
 
-An ASI:One agent that tells an Indian produce trader **which mandi to sell at, or buy from, today**, ranked by what they actually clear after real road freight, spoilage and fees. The sticker price at a mandi is not the answer: a mandi that pays Rs 100 more per quintal can lose once you drive another 200 km.
+An ASI:One agent that tells an Indian produce trader **which mandi to sell at, or buy from, today**, ranked by what they actually clear after real road freight, transit loss and mandi fees. The sticker price at a mandi is not the answer: a mandi that pays Rs 100 more per quintal can lose once you drive another 200 km.
 
 Built at Fetch-A-Thon 3.0 (Fetch.ai Innovation Lab x Masters' Union Gurugram, 24 Oct 2026), the "ASI:One Agent Challenge: From Intent to Action". Team ID `fetchathon3.0-5865`.
 
 **Team:** Laksh Pradhwani (lead), Mark Patel, Aryan Rao, Saiansh Kathuria.
+
+All three agents carry the Innovation Lab and hackathon badges in their Agentverse READMEs (the files are in `docs/agent-readme-*.md` and are published by the agents themselves).
+
+## Submission links
+
+| Item | Link |
+|---|---|
+| Public GitHub repo | https://github.com/TheRealLaksh/fetchathon-3-agent |
+| Agent in ASI:One | https://asi1.ai/ai/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4 |
+| Public ASI:One shared chat | _to be added before submission_ |
+| Demo video (3 to 5 min) | _to be added before submission_ |
+| Write-up | [docs/writeup.md](docs/writeup.md) |
+| Agentverse profiles | in the Agents table below |
+
+## What the hackpack asks for, and where it is
+
+| Requirement | Where |
+|---|---|
+| Register at least one agent on Agentverse | Three agents, each with an Agentverse profile (table below). The front agent is a mailbox agent. |
+| Agent Chat Protocol | Front agent, `mandi/front_agent.py`. |
+| Discoverable and usable in ASI:One | Open the profile link below in ASI:One, or mention the agent by address. Handle `@mandi-desk` is set on Agentverse. |
+| Meaningful tool use or multi-agent orchestration | Live data APIs plus three cooperating agents that exchange typed messages. |
+| Whole primary workflow inside ASI:One | Question, ranked answer and card all happen in the ASI:One chat. No custom frontend. |
+| Public repo with run or test instructions | This README (Run it, Test it). |
+
+Bonus items: multi-agent collaboration (yes), Interactive Cards (a card is sent and renders in ASI:One; see Known limits), reliability and error handling (snapshot and route fallbacks, tested), real-time data (data.gov.in daily prices, OSRM routes), could keep running after the hackathon (needs hosting; see What is next in the write-up). Payment Protocol: not implemented.
 
 ## Try it in ASI:One
 
 Open the agent in ASI:One and ask in plain language:
 
 - Profile: https://asi1.ai/ai/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4
-- Handle: `@mandi-desk`
+- Handle: `@mandi-desk` (the address above always works; ASI:One may take a while to show the new name and handle)
 
 > I have 25 tonnes of tomato in Gurugram. Where should I sell today?
 
 > I run a restaurant in Delhi. Where is onion cheapest to buy today?
 
-Replies take a while: ASI:One passes the message to the agent through the Agentverse mailbox (about 1 to 2 minutes), and the agent then pulls live data. The chat page may need a reload to show the reply.
+Replies take a while: ASI:One passes the message to the agent through the Agentverse mailbox (about 1 to 2 minutes), and the agent then pulls live data. The chat page may need a reload to show the reply. The agents must be running for this to work.
 
 ## Agents
 
@@ -67,7 +93,18 @@ Fetch.ai pieces used: uAgents, Agentverse mailbox agent, Agent Chat Protocol, AS
 - **Real:** mandi prices (data.gov.in, dated the day of the question), mandi locations (OpenStreetMap), road distance and drive time (OSRM).
 - **Assumptions** (shown in every reply, and the user can override them in chat, for example "my truck costs Rs 4 per tonne-km"): freight Rs 3.0 per tonne-km, market fee 2%, agent commission 0% (not included), transit loss 0.15 to 0.25% of value per drive hour. Sources and how each was derived are in [SOURCES.md](SOURCES.md). The top of the ranking did not change in our sensitivity tests, but the net figures move with these numbers.
 
-## Run it
+## Test it
+
+**No keys needed:** the maths, ranking, card format, load planner and both fallbacks are covered by offline tests.
+
+```bash
+pip install -r requirements.txt
+python -m mandi.selftest      # prints nine "ok" lines and "9 tests passed"
+```
+
+**Live, in ASI:One:** use the link in "Try it in ASI:One" while the agents are running (they run on the team's laptop during judging).
+
+## Run it yourself
 
 Needs Python 3.10 to 3.13 (3.14 is not supported by uAgents yet).
 
@@ -75,20 +112,37 @@ Needs Python 3.10 to 3.13 (3.14 is not supported by uAgents yet).
 python -m venv .venv
 # Windows: .venv\Scripts\activate   macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # fill in ASI1_API_KEY, AGENTVERSE_API_KEY, DATA_GOV_IN_API_KEY and a long AGENT_SEED_PHRASE
+cp .env.example .env
 ```
 
-Start three processes (each in its own terminal), the front agent last:
+Fill in `.env` (never commit it):
+
+| Variable | What it is | Where to get it |
+|---|---|---|
+| `ASI1_API_KEY` | ASI1 model access | https://asi1.ai/platform/developer |
+| `AGENTVERSE_API_KEY` | connects the mailbox | https://agentverse.ai/profile/api-keys |
+| `DATA_GOV_IN_API_KEY` | mandi prices | free: sign up at https://www.data.gov.in, open the dataset "Current Daily Price of Various Commodities from Various Markets (Mandi)", API tab, Generate API Key |
+| `AGENT_SEED_PHRASE` | one long random string | make one up; the front agent derives the helper agents' addresses from it, so use the same value in all three processes. A new seed gives new addresses. |
+
+Start three processes, each in its own terminal, the front agent last:
 
 ```bash
 python -m mandi.price_agent
 python -m mandi.logistics_agent
-USE_MAILBOX=1 python -m mandi.front_agent     # then connect the mailbox from the Inspector link it prints
+USE_MAILBOX=1 python -m mandi.front_agent
 ```
+
+**Connect the mailbox** (once): open the Agent Inspector link the front agent prints while signed in to Agentverse, click Connect, then Mailbox. If the page cannot reach `localhost` (a browser setting can block it), connect from a terminal instead:
+
+```bash
+curl -X POST http://127.0.0.1:8001/connect -H "Content-Type: application/json" -d '{"user_token": "<AGENTVERSE_API_KEY>", "agent_type": "mailbox"}'
+```
+
+Then open the front agent in ASI:One and ask a question.
 
 Local test without ASI:One: `python -m mandi.chat_test "I have 8 tonnes of tomato in Gurugram. Where should I sell today?"`
 
-Other tools: `python -m mandi.selftest` (9 offline tests), `python -m mandi.warm_cache Tomato Onion Potato -- "Gurugram, Haryana" "Delhi, NCT of Delhi"` (pre-loads map lookups; the first question about a new crop or town is slow without it).
+Pre-load the map cache so the first question about a crop or town is fast (run while no question is being answered): `python -m mandi.warm_cache Tomato Onion Potato -- "Gurugram, Haryana" "Delhi, NCT of Delhi"`
 
 ## Known limits
 
@@ -109,9 +163,10 @@ mandi/logistics_agent.py Logistics Agent
 mandi/front_agent.py     ASI:One-facing agent
 mandi/ranking.py         ranking and reply text
 mandi/extras.py          interactive card and load planner
+mandi/branding.py        Agentverse profile details for each agent
 mandi/selftest.py        offline tests
 SOURCES.md               sources for the assumptions
-docs/                    write-up and video script
+docs/                    write-up, video script, submission checklist, agent READMEs
 assets/                  profile picture and banner
 ```
 
@@ -119,4 +174,8 @@ assets/                  profile picture and banner
 
 - ASI:One API key: https://asi1.ai/platform/developer
 - Agentverse API key: https://agentverse.ai/profile/api-keys
-- Docs: https://innovationlab.fetch.ai/resources/docs/intro
+- Mandi price dataset (data.gov.in): https://www.data.gov.in/resource/current-daily-price-various-commodities-various-markets-mandi
+- Place lookup: OpenStreetMap Nominatim, https://nominatim.openstreetmap.org (usage policy: one request per second, which the agent respects)
+- Road routes: OSRM public demo server, https://router.project-osrm.org
+- Fetch.ai docs: https://innovationlab.fetch.ai/resources/docs/intro
+- Interactive Cards docs: https://innovationlab.fetch.ai/resources/docs/interactive-cards/asi-interactive-cards

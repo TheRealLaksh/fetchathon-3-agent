@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from uagents import Agent, Context
 
+from mandi.branding import profile_kwargs
 from mandi.core import fetch_prices_with_source
 from mandi.models import MandiRow, PriceReply, PriceRequest
 
@@ -12,7 +13,15 @@ load_dotenv()
 
 
 def make_price_agent(port: int = 8002, **kwargs) -> Agent:
-    agent = Agent(name="mandi-price-agent", seed=os.environ["AGENT_SEED_PHRASE"] + "-price", port=port, **kwargs)
+    agent = Agent(
+        name="Mandi Price Agent", seed=os.environ["AGENT_SEED_PHRASE"] + "-price", port=port,
+        **profile_kwargs(
+            "agent-readme-price.md",
+            "Fetches today's real modal mandi prices per market from the government daily mandi dataset "
+            "(data.gov.in). Part of Mandi Net-Price Desk.",
+        ),
+        **kwargs,
+    )
 
     @agent.on_message(PriceRequest, replies=PriceReply)
     async def handle(ctx: Context, sender: str, msg: PriceRequest):

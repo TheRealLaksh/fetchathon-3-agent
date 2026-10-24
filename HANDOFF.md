@@ -22,6 +22,7 @@ python <agent>.py
 Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat with Agent" in ASI:One. A mailbox agent only works while the script runs.
 
 ## Code map
+- `mandi/warm_cache.py`: pre-warms the geocode cache. Run when agents are idle: `python -m mandi.warm_cache Tomato Onion Potato -- "Gurugram, Haryana" "Delhi, NCT of Delhi"` (cold first query for a new crop takes minutes).
 - `mandi/front_agent.py` (port 8001, ASI:One chat protocol, same seed as the earlier test agent so the existing mailbox works), `mandi/ranking.py` (net-price ranking + reply text + neighbour-state map), `mandi/chat_test.py` (chat client for local tests: `python -m mandi.chat_test "question"`). Full local chain tested 24 Oct: real tomato prices + real routes -> ranked table (Sohna 18 km best, Rs 2,443/qtl net).
 - `mandi/models.py`, `mandi/price_agent.py` (port 8002), `mandi/logistics_agent.py` (port 8003): the two real uAgents (agent-to-agent messages). Run each with `python -m mandi.price_agent` etc.; `python -m mandi.local_test` is a client that exercises both. TESTED 24 Oct: 23 real Haryana tomato rows, real road distances from Gurugram (Faridabad 37.8 km, Narnaul 111.6 km).
 - `mandi/core.py`: Mandi desk maths + data calls (data.gov.in prices, Nominatim geocode, OSRM route, `net_price`). Keyless parts tested live 24 Oct. Assumptions (truck rate, spoilage, commission) are labelled placeholders.
@@ -62,6 +63,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~15:35): Agentverse starter prompts added; onion (sell) test OK but took minutes on a cold cache; added warm_cache.py. Potato + off-topic tests were still running.
 - 2026-10-24 (~15:20): Agentverse profile set (name Mandi Net-Price Desk, 160-char description, README); buyer mode tested OK (onion, Delhi); reply wording fixed. KNOWN RISK: a cold geocode cache makes the first query for a new crop/area take minutes (Nominatim 1 req/s) -> PRE-WARM the cache before the demo and before judging.
 - 2026-10-24 (~14:55): END-TO-END IN ASI:ONE WORKS. Question sent from Laksh's ASI:One (profile chat of agent1qv7j...) -> mailbox -> front agent -> Price + Logistics agents -> ranked table with Sohna APMC best (Rs 2,443/qtl net). Needs all three processes running on the laptop (price, logistics, front with USE_MAILBOX=1). ASI:One still shows the old profile name 'ASI-agent': set name/description on the Agentverse agent profile. Nothing else changed in code.
 - 2026-10-24 (~14:50): built front agent (LLM intent extraction, calls Price + Logistics agents, ranks, replies); fixed geocode caching of failed lookups (only cache real answers) and the market-name cleaner; district-centre fallbacks are shown with ~. Gotcha: writing regex with backslash-b through a bash heredoc turned it into a backspace char; write it via a file using chr(92).
@@ -76,12 +78,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 2:55 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 2:57 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `14869f9` 2026-10-24 14:55 Fix reply wording for buyer mode and plural; record profile setup
 - `8a9ab14` 2026-10-24 14:52 Record end-to-end ASI:One success in handoff
 - `5551520` 2026-10-24 14:49 Add front ASI:One agent, net-price ranking and chat test; fix geocode caching
 - `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
@@ -98,6 +101,6 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ```
 M  HANDOFF.md
-M  mandi/ranking.py
+A  mandi/warm_cache.py
 ```
 <!-- handoff:auto:end -->

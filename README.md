@@ -83,11 +83,29 @@ Open the agent in ASI:One and ask in plain language:
 
 ## Agents
 
-| Agent | Address | Agentverse profile | What it does |
-|---|---|---|---|
-| **Mandi Net-Price Desk** (front agent, `@mandi-desk`) | `agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4` | [profile](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile) | Speaks the Agent Chat Protocol, reads the request with the ASI1 LLM, calls the two agents below, ranks the mandis, replies in chat with a table and an interactive card. |
-| Mandi Price Agent | `agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0` | [profile](https://agentverse.ai/agents/details/agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0/profile) | Fetches today's real modal prices per mandi from the government daily mandi dataset (data.gov.in). Falls back to the last saved snapshot if the API is down. |
-| Mandi Logistics Agent | `agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3` | [profile](https://agentverse.ai/agents/details/agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3/profile) | Locates each mandi (OpenStreetMap) and returns real road distance and drive time (OSRM). Estimates from straight-line distance if the routing service is down. |
+### 1. Mandi Net-Price Desk &nbsp;`front agent` &nbsp;`@mandi-desk`
+
+Speaks the Agent Chat Protocol, reads the request with the ASI1 LLM, calls the two agents below, ranks the mandis, and replies in chat with a table and an interactive card. [Agentverse profile](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile)
+
+```
+agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4
+```
+
+### 2. Mandi Price Agent &nbsp;`helper`
+
+Fetches today's real modal prices per mandi from the government daily mandi dataset (data.gov.in). Falls back to the last saved snapshot if the API is down. [Agentverse profile](https://agentverse.ai/agents/details/agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0/profile)
+
+```
+agent1qdppp6kky9mlmq9j4c7v0nksqpvusy7w9vjxylzuu6xt48fs20mw7ecwcp0
+```
+
+### 3. Mandi Logistics Agent &nbsp;`helper`
+
+Locates each mandi (OpenStreetMap) and returns real road distance and drive time (OSRM). Estimates from straight-line distance if the routing service is down. [Agentverse profile](https://agentverse.ai/agents/details/agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3/profile)
+
+```
+agent1qtw0yw8kanxv48wd0v2zrhdg4p6ewersauhstygfy4s2qv20fyxkjl8w9y3
+```
 
 The front agent is a mailbox agent (reachable from ASI:One). The two helper agents run as local agents registered on Agentverse (their profile pages show Active and Local) and are called by the front agent over HTTP. The three are separate uAgents that exchange typed messages (`mandi/models.py`), so this is a real multi-agent workflow, not one agent calling functions. All three carry the Innovation Lab and hackathon badges in their Agentverse READMEs (`docs/agent-readme-*.md`).
 

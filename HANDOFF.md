@@ -84,12 +84,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 4:05 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 4:07 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `d8d6391` 2026-10-24 16:05 README: centered hero, at-a-glance block, answer image, architecture diagram, collapsible sections
 - `92901b9` 2026-10-24 15:56 README review fixes: badges in agent READMEs, run and test steps, submission links
 - `8c8da6f` 2026-10-24 15:50 Add detailed video brief for the /brag session
 - `1117198` 2026-10-24 15:47 Add submission docs: README, write-up, video script, checklist
@@ -104,12 +105,10 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `8a9ab14` 2026-10-24 14:52 Record end-to-end ASI:One success in handoff
 - `5551520` 2026-10-24 14:49 Add front ASI:One agent, net-price ranking and chat test; fix geocode caching
 - `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
-- `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
 
 ### Uncommitted changes at refresh time
 
 ```
 M  README.md
-A  assets/example-answer.png
 ```
 <!-- handoff:auto:end -->

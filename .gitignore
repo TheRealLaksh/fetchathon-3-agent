@@ -22,3 +22,4 @@ __pycache__/
 .claude/worktrees/
 mandi/geocache.json
 mandi/snapshots/
+brag-output*/

@@ -83,12 +83,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:47 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:50 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `1117198` 2026-10-24 15:47 Add submission docs: README, write-up, video script, checklist
 - `62ce375` 2026-10-24 15:44 Add profile picture and banner, log incoming messages, record card-tap findings
 - `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
 - `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
@@ -103,15 +104,11 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
 - `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
 - `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
-- `a922855` 2026-10-24 00:30 Fix template: endpoint overrides mailbox, set only one
 
 ### Uncommitted changes at refresh time
 
 ```
-M  HANDOFF.md
-M  README.md
-A  docs/submission-checklist.md
-A  docs/video-script.md
-A  docs/writeup.md
+M  .gitignore
+A  docs/video-brag-prompt.md
 ```
 <!-- handoff:auto:end -->

@@ -87,7 +87,7 @@ Open the agent in ASI:One and ask in plain language:
 
 ### 1. Mandi Net-Price Desk &nbsp;`front agent` &nbsp;`@mandi-desk`
 
-Speaks the Agent Chat Protocol, reads the request with the ASI1 LLM, calls the two agents below, ranks the mandis, and replies in chat with a table and an interactive card. [Agentverse profile](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile)
+Speaks the Agent Chat Protocol, reads the request with the ASI1 LLM (English, Hindi or Hinglish), calls the two agents below, ranks the mandis, and replies in chat with a table, a short ASI1-written "why this one" line and an interactive card. It remembers each chat user's crop, place and cost settings (stored in the agent, say "forget me" to clear), so follow-ups like "what if 60 quintals" or "same for onion" work. The "why this one" line is built from the ranking numbers only and is dropped if it contains a number or any timing advice the data does not support. [Agentverse profile](https://agentverse.ai/agents/details/agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4/profile)
 
 ```
 agent1qv7jdg7dyduuns3n4sp04gu5jkdhxv2s803p824h9c37ymw64mj7ufy86n4

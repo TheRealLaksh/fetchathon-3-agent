@@ -21,6 +21,8 @@ __pycache__/
 .claude/settings.local.json
 .claude/worktrees/
 mandi/geocache.json
+mandi/routecache.json
 mandi/snapshots/
 brag-output*/
 video-output/
+logs/

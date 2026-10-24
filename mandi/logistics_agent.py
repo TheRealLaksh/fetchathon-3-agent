@@ -2,15 +2,18 @@
 import asyncio
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 
 from dotenv import load_dotenv
 from uagents import Agent, Context
 
 from mandi.branding import profile_kwargs
-from mandi.core import estimate_route, geocode, haversine_km, road_route
+from mandi.core import estimate_route, geocode, haversine_km, road_route, save_route_cache
 from mandi.models import RouteInfo, RouteReply, RouteRequest
 
 load_dotenv()
+
+ROUTE_WORKERS = 6  # parallel OSRM requests; the public demo server is shared, so keep this modest
 
 
 def _clean(name: str) -> str:
@@ -35,17 +38,26 @@ def compute(req: RouteRequest) -> RouteReply:
     if not origin:
         return RouteReply(origin=req.origin, origin_found=False, routes=[], error="Could not locate the origin")
     routes, skipped, estimated = [], 0, 0
+    located = []  # geocoding stays sequential (Nominatim allows 1 request/second); routing below runs in parallel
     for p in req.places:
         pos, approx = _locate(p)
         if not pos or haversine_km(origin, pos) > req.max_radius_km:
             skipped += 1
             continue
+        located.append((p, pos, approx))
+
+    def leg_for(item):
+        _, pos, approx = item
         try:
-            leg = road_route(origin, pos)
+            return road_route(origin, pos), approx, False
         except Exception:  # routing service unreachable: estimate instead of failing the whole answer
-            leg = estimate_route(origin, pos)
-            approx = True
-            estimated += 1
+            return estimate_route(origin, pos), True, True
+
+    with ThreadPoolExecutor(max_workers=ROUTE_WORKERS) as pool:
+        legs = list(pool.map(leg_for, located))  # order preserved
+    save_route_cache()
+    for (p, _, _), (leg, approx, was_estimated) in zip(located, legs):
+        estimated += was_estimated
         if not leg:
             skipped += 1
             continue

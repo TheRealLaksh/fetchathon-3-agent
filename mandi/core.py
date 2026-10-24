@@ -7,6 +7,7 @@ editable defaults, shown to the user as assumptions, never presented as data.
 import json
 import math
 import os
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -95,15 +96,52 @@ def geocode(query: str) -> tuple | None:
     return tuple(cache[query]) if cache[query] else None
 
 
+ROUTE_CACHE = Path(__file__).with_name("routecache.json")
+_route_lock = threading.Lock()
+_routes: dict | None = None  # "lat,lon|lat,lon" -> [km, hours]; real OSRM answers only, kept on disk
+
+
+def _route_key(a: tuple, b: tuple) -> str:
+    return f"{a[0]:.3f},{a[1]:.3f}|{b[0]:.3f},{b[1]:.3f}"
+
+
+def _route_cache() -> dict:
+    global _routes
+    if _routes is None:
+        try:
+            _routes = json.loads(ROUTE_CACHE.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            _routes = {}
+    return _routes
+
+
+def save_route_cache() -> None:
+    with _route_lock:
+        if _routes:
+            ROUTE_CACHE.write_text(json.dumps(_routes), encoding="utf-8")
+
+
 def road_route(a: tuple, b: tuple) -> tuple[float, float] | None:
-    """Real road (km, hours) between two (lat, lon) points from OSRM, or None if unreachable."""
+    """Real road (km, hours) between two (lat, lon) points from OSRM, or None if unreachable.
+
+    Answers are cached (roads between two fixed points do not change during a hackathon), so a repeat
+    question costs no routing calls. Safe to call from several threads.
+    """
+    key = _route_key(a, b)
+    with _route_lock:
+        hit = _route_cache().get(key)
+    if hit:
+        return hit[0], hit[1]
     url = f"https://router.project-osrm.org/route/v1/driving/{a[1]},{a[0]};{b[1]},{b[0]}"
     r = httpx.get(url, params={"overview": "false"}, headers=UA, timeout=20)
     data = r.json()
     if data.get("code") != "Ok":
         return None
     leg = data["routes"][0]
-    return leg["distance"] / 1000.0, leg["duration"] / 3600.0
+    result = (leg["distance"] / 1000.0, leg["duration"] / 3600.0)
+    with _route_lock:
+        _route_cache()[key] = [result[0], result[1]]
+    return result
 
 
 def fetch_prices(commodity: str, state: str | None = None, limit: int = 200) -> list[dict]:

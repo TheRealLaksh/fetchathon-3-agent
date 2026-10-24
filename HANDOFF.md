@@ -22,6 +22,7 @@ python <agent>.py
 Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat with Agent" in ASI:One. A mailbox agent only works while the script runs.
 
 ## Code map
+- `mandi/personal.py` (25 Oct): per-user memory merge, "forget me", grounding check and prompt for the ASI1 "why this one" line. Tests in `mandi/test_upgrades.py`.
 - `mandi/warm_cache.py`: pre-warms the geocode cache. Run when agents are idle: `python -m mandi.warm_cache Tomato Onion Potato -- "Gurugram, Haryana" "Delhi, NCT of Delhi"` (cold first query for a new crop takes minutes).
 - `mandi/front_agent.py` (port 8001, ASI:One chat protocol, same seed as the earlier test agent so the existing mailbox works), `mandi/ranking.py` (net-price ranking + reply text + neighbour-state map), `mandi/chat_test.py` (chat client for local tests: `python -m mandi.chat_test "question"`). Full local chain tested 24 Oct: real tomato prices + real routes -> ranked table (Sohna 18 km best, Rs 2,443/qtl net).
 - `mandi/models.py`, `mandi/price_agent.py` (port 8002), `mandi/logistics_agent.py` (port 8003): the two real uAgents (agent-to-agent messages). Run each with `python -m mandi.price_agent` etc.; `python -m mandi.local_test` is a client that exercises both. TESTED 24 Oct: 23 real Haryana tomato rows, real road distances from Gurugram (Faridabad 37.8 km, Narnaul 111.6 km).
@@ -59,6 +60,9 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Results time: 12:15 (hackpack) vs 10:00 (ASI:One) on 28 Oct.
 
 ## Decisions not to undo
+- Never POST `/connect` to the front agent again: it replaces the Agentverse README and CLEARS the starter prompts (the profile text there predates the 25 Oct features; the repo's `docs/agent-readme-front.md` has the new text).
+- Keep PYTHONIOENCODING=utf-8 for all agent processes (Hindi breaks on the default Windows console code page).
+- ASI:One displays only the last message of a turn: anything the user must see (recommendation, why-line, assumptions, memory note) goes in the card message text.
 - Project idea is chosen by Laksh on the day, not before.
 - Repo is public; no secrets ever committed.
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
@@ -67,7 +71,8 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Output in `video-output/` (read `STATUS.md` there first): `demo.mp4` (1920x1080, 30 fps, about 4:44, Zira voice-over, burned-in captions), `captions.srt`, `voiceover.txt`, `shotlist.md` (every scene's URL/command/actions/narration, for re-recording by hand), `frames/` (one check frame per scene), `clips/` (per-scene clips + raw captures), `audio/` (one WAV per scene, so the voice can be swapped), `tools/` (build scripts: `build_term_scenes.py`, `build_final.py`, `build_shotlist.py`, `term-run.ps1`, `tts.ps1`).
 - Real recording of Brave (Claude in Chrome) and Windows Terminal via ffmpeg gdigrab 2560x1440 -> 1080p. Scene 3 and 4 use the live ASI:One chat (https://asi1.ai/chat/50a184bf-3b9c-4a31-a2ca-e8218ce5b898, sent 22:56 on 24 Oct); Plan B was not needed. Terminal waits in scenes 5, 6, 8 are sped up 8x and labelled.
 - The live data.gov.in rows move through the day (tomato top was Bassi, then Kurali, then Sonepat), so each scene narrates only its own screen. Scene 1 uses the README example image (8 tonnes), worded "in this example run".
-- Open: the Price and Logistics Agentverse profiles show no name/README after the 22:52 restart (only Active and Local); the narration claim "tested the price fallback live with a deliberately wrong key" is from earlier work (HANDOFF 24 Oct 15:30), not re-shown. Video not uploaded anywhere.
+- Fixed 25 Oct ~02:30: the Price and Logistics Agentverse profiles had never been branded (local agents only publish their profile on `/connect`, not at start-up). Re-published without restarting anything: `POST http://127.0.0.1:8002/connect` and `:8003/connect` with `{"user_token": <AGENTVERSE_API_KEY from .env>, "agent_type": "custom", "endpoint": "http://127.0.0.1:<port>/submit"}`; both pages now show name, README with badges, avatar, banner and description (scene 7 of demo.mp4 was re-recorded afterwards and shows the branded pages). Re-run after any profile text change.
+- Open: the narration claim "tested the price fallback live with a deliberately wrong key" is from earlier work (HANDOFF 24 Oct 15:30), not re-shown. Video not uploaded anywhere.
 
 ## Demo video (made 24 Oct 2026, ~16:40, via /brag)
 - Output (gitignored, local only): `brag-output/` = `brag.mp4` (1920x1080, 30 fps, 4:15, narrated, captioned), `brag.jpg` poster, `voiceover.txt` (verbatim narration per scene, for a human re-record), `captions.srt`, `share-copy.txt`, `brag-plan.md`, `composition-brief.md`, `composition/` (Hyperframes project, `npx hyperframes check` = 0 errors).
@@ -77,6 +82,9 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Known wording issue to decide: scene 8 narration (verbatim from the brief) says the reply "lists every one with its source". The real reply names the basis (e.g. "Haryana market fee plus RDF") but the named sources (Business Standard/CMIE, Tribune, NABCONS) are in SOURCES.md, not in the reply text. Suggested fix: "and the repo lists every one with its source" (re-run `make_vo.py`, `build_comp.py`, render).
 
 ## Session log (newest first)
+- 2026-10-25 (~05:30): UPGRADES (all tested, agents restarted, verified through ASI:One): (1) route lookups cached (`mandi/routecache.json`) and run 6 in parallel in the logistics agent: route step 29.7 s -> 6.4 s cold, 0 s warm; full chat_test question about 50 s -> 17 to 25 s; (2) per-user memory in the front agent's storage (crop, place, quantity, cost settings; `mandi/personal.py`), follow-ups ("what if 60 quintals", "same for onion"), "forget me", Hindi, Devanagari and Hinglish understood and answered; (3) ASI1-written "Why this one" line built from the ranking numbers only (dropped if it has a number or timing advice the data lacks). ASI:One shows ONLY the last message of a turn, so the card message's own text now carries recommendation, why-line, assumptions and memory note (the table stays in the earlier message). Hindi needed UTF-8 console output (set in code and in `scripts/start-agents.ps1`, which also logs to `logs/`). Rollback: `git tag demo-v1` = state before all this (`git checkout demo-v1 -- mandi scripts && restart agents`). New tests: `python -m mandi.test_upgrades` (8); `python -m mandi.selftest` still 9. Nothing committed or pushed.
+- 2026-10-25 (~03:15): re-recorded the Price and Logistics profile shots for scene 7 (now the branded pages) and rebuilt `video-output/demo.mp4` (still 4:44); sent to Laksh. No code changed.
+- 2026-10-25 (~02:30): re-published the Price and Logistics Agentverse profiles (name, README, avatar, banner, description) via their `/connect` routes; checked both pages; end-to-end question still answers (tomato top was Sonepat at 3,398 net, live data keeps moving). No code changed, front agent untouched, nothing restarted. Video scene 7 still shows the old bare helper pages.
 - 2026-10-25 (~01:15): SCREEN-RECORDED DEMO VIDEO BUILT (`video-output/demo.mp4`, about 4:44) from the screen-record brief; agents were restarted at 22:52 (PC sleep killed them); deadline is now 10:00 AM Sun 25 Oct (mail 22:52). No code changed. See "Screen-recorded demo video".
 - 2026-10-24 (~16:40): VIDEO BUILT with /brag (see "Demo video" above). 11 scenes, 255 s, Hyperframes check 0 errors, contrast 89/89. Nothing in the code changed. Still to do by Laksh: watch it through, upload it for Devpost, decide the scene 8 wording above, optionally add real screen clips to `assets/clips/` for scenes 3 and 7.
 - 2026-10-24 (~16:20): README redesigned and checked on the live GitHub page: centered hero + badge row + nav links, at-a-glance 3-column block, answer image (assets/example-answer.png, re-created from a real reply), branded architecture image (assets/architecture.png), agents as readable blocks with copyable addresses, collapsible Run and File map sections, NOTE and WARNING callouts. Required badge lines kept exactly at the top. Images are generated with Pillow (scripts live only in the session scratchpad; regenerate by hand if numbers change).
@@ -101,12 +109,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 11:50 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 25 Oct 2026, 12:42 am IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `a507393` 2026-10-24 23:50 Add screen-recorded demo video tooling, shotlist and handoff notes
 - `cd619e7` 2026-10-24 16:28 Add screen-recorded video brief (replaces the motion-graphics one)
 - `5e27d1b` 2026-10-24 16:24 README: list all three Agentverse profile links in the submission table
 - `e34e678` 2026-10-24 16:10 Soften restart note in checklist
@@ -121,19 +130,22 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `62ce375` 2026-10-24 15:44 Add profile picture and banner, log incoming messages, record card-tap findings
 - `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
 - `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
-- `4d33d2c` 2026-10-24 15:11 Add offline fallbacks: saved price snapshot and estimated routes
 
 ### Uncommitted changes at refresh time
 
 ```
+M  .gitignore
 M  HANDOFF.md
-A  video-output/shotlist.md
-A  video-output/tools/build_final.py
-A  video-output/tools/build_shotlist.py
-A  video-output/tools/build_term_scenes.py
-A  video-output/tools/mux.ps1
-A  video-output/tools/place-window.ps1
-A  video-output/tools/term-run.ps1
-A  video-output/tools/tts.ps1
+M  README.md
+M  docs/agent-readme-front.md
+M  docs/writeup.md
+M  mandi/core.py
+M  mandi/front_agent.py
+M  mandi/logistics_agent.py
+A  mandi/personal.py
+M  mandi/ranking.py
+A  mandi/test_upgrades.py
+M  scripts/start-agents.ps1
+ M video-output/tools/build_term_scenes.py
 ```
 <!-- handoff:auto:end -->

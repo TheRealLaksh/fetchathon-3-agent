@@ -34,7 +34,9 @@ Three separate uAgents that exchange typed messages:
 - **Price Agent**, which calls the data.gov.in daily mandi dataset.
 - **Logistics Agent**, which geocodes mandis with OpenStreetMap and gets road distance and drive time from OSRM.
 
-The ranking maths is deterministic code, not LLM output, so the numbers are repeatable and checked by 9 offline tests. Fetch.ai pieces used: uAgents, Agentverse mailbox, Agent Chat Protocol, ASI1 LLM, agent-to-agent messaging, and an ASI:One interactive card.
+The ranking maths is deterministic code, not LLM output, so the numbers are repeatable and checked by 9 offline tests.
+
+Personal and multilingual: the desk remembers each user's crop, place and cost settings (per chat, clearable with "forget me"), accepts follow-ups such as "what if 60 quintals", and understands Hindi and Hinglish. The ASI1 model also writes a two-sentence "why this one" explanation, but only from the ranking numbers: any sentence with a number the data does not contain, or any timing advice, is discarded. Route lookups are cached and run in parallel, so the agents' own work now typically takes well under half a minute (it was about a minute before), on top of ASI:One's message delay (extra offline tests: `python -m mandi.test_upgrades`). Fetch.ai pieces used: uAgents, Agentverse mailbox, Agent Chat Protocol, ASI1 LLM, agent-to-agent messaging, and an ASI:One interactive card.
 
 ## What makes it dependable
 

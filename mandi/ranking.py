@@ -84,7 +84,7 @@ def rank(rows, routes, commodity: str, mode: str, a: Assumptions) -> list[Result
 
 
 def format_reply(results: list[Result], commodity: str, origin: str, mode: str, quintals: float | None,
-                 a: Assumptions, skipped: int, top: int = 6) -> str:
+                 a: Assumptions, skipped: int, top: int = 6, why: str | None = None) -> str:
     if not results:
         return (f"I found no {commodity} prices I could route from {origin} today. "
                 "Try another crop or a nearby city.")
@@ -112,6 +112,8 @@ def format_reply(results: list[Result], commodity: str, origin: str, mode: str, 
         gain = abs(best.net - last.net) * quintals
         lines.append(f"For {quintals:,.0f} quintals, picking {best.market} over the last option shown "
                      f"is a difference of about Rs {gain:,.0f}.")
+    if why:  # written by the ASI1 model from the numbers above only; omitted if it fails the grounding check
+        lines.append(f"\n**Why this one:** {why}")
     lines.append(
         f"\n_Prices: data.gov.in daily mandi data dated {best.arrival_date} (mean of today's varieties per mandi). "
         f"Distances: real road routes (OpenStreetMap/OSRM). Assumptions (tell me to change any): truck Rs "

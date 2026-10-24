@@ -46,6 +46,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - ASI:One key page is asi1.ai/platform/developer (docs link /dashboard/api-keys 404s). Key names allow only letters, numbers, spaces.
 
 ## Next steps (in order)
+000. Demo video is built (`brag-output/brag.mp4`): watch it through, decide the scene 8 wording (see "Demo video"), upload it for Devpost (3 to 5 min rule: it is 4:15).
 00. Agentverse profile: rename to Mandi Net-Price Desk + README/description; test buyer mode and other crops (onion, potato); tune Assumptions with real numbers; maybe Interactive Card; freeze 15:30; shared ASI:One chat URL; video; Devpost.
 0. MANDI DESK: data.gov.in key is in .env (done 24 Oct). Verified fresh rows dated 24/10/2026 for Tomato, Onion, Potato, Banana, Cauliflower (Tamil Nadu has most rows; Haryana/Punjab 12-24 each; Apple timed out once). Fields: arrival_date, commodity, district, grade, market, max_price, min_price, modal_price, state, variety. Next: front ASI:One agent (chat protocol) that calls both agents + net-price card + advisor; then build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
 1. Join Discord (channel Fetch-A-Thon 3.0) and agree roles with teammates.
@@ -62,7 +63,22 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Repo is public; no secrets ever committed.
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
+## Screen-recorded demo video (made 24 to 25 Oct 2026, by Claude from `docs/video-screen-record-prompt.md`)
+- Output in `video-output/` (read `STATUS.md` there first): `demo.mp4` (1920x1080, 30 fps, about 4:44, Zira voice-over, burned-in captions), `captions.srt`, `voiceover.txt`, `shotlist.md` (every scene's URL/command/actions/narration, for re-recording by hand), `frames/` (one check frame per scene), `clips/` (per-scene clips + raw captures), `audio/` (one WAV per scene, so the voice can be swapped), `tools/` (build scripts: `build_term_scenes.py`, `build_final.py`, `build_shotlist.py`, `term-run.ps1`, `tts.ps1`).
+- Real recording of Brave (Claude in Chrome) and Windows Terminal via ffmpeg gdigrab 2560x1440 -> 1080p. Scene 3 and 4 use the live ASI:One chat (https://asi1.ai/chat/50a184bf-3b9c-4a31-a2ca-e8218ce5b898, sent 22:56 on 24 Oct); Plan B was not needed. Terminal waits in scenes 5, 6, 8 are sped up 8x and labelled.
+- The live data.gov.in rows move through the day (tomato top was Bassi, then Kurali, then Sonepat), so each scene narrates only its own screen. Scene 1 uses the README example image (8 tonnes), worded "in this example run".
+- Open: the Price and Logistics Agentverse profiles show no name/README after the 22:52 restart (only Active and Local); the narration claim "tested the price fallback live with a deliberately wrong key" is from earlier work (HANDOFF 24 Oct 15:30), not re-shown. Video not uploaded anywhere.
+
+## Demo video (made 24 Oct 2026, ~16:40, via /brag)
+- Output (gitignored, local only): `brag-output/` = `brag.mp4` (1920x1080, 30 fps, 4:15, narrated, captioned), `brag.jpg` poster, `voiceover.txt` (verbatim narration per scene, for a human re-record), `captions.srt`, `share-copy.txt`, `brag-plan.md`, `composition-brief.md`, `composition/` (Hyperframes project, `npx hyperframes check` = 0 errors).
+- Source of truth for content: `docs/video-brag-prompt.md`. Pipeline to re-time or edit a scene: `brag-output/build/` (`script.json` narration + scene lengths, `make_vo.py` Kokoro clips per sentence + timeline + captions, `index.template.html`, `build_comp.py`). Run with `C:\dev\kokoro-venv\Scripts\python.exe` (separate venv with kokoro-onnx, not the project `.venv`), then `npx hyperframes check` and `npx hyperframes render --quality high --output ../brag.mp4` from `brag-output/composition`.
+- Narration is Kokoro `af_heart`, speed 0.86, loudness-normalised to -16 LUFS. It was not listened to by Claude: check how it says Sohna, Gohana, Narnaul, mandi, quintal, OSRM; if any is off, record over `voiceover.txt` or respell in `script.json`.
+- The ASI:One chat is a re-created panel (labelled), never a recording. Real reply text comes from `mandi/ranking.py` and `mandi/front_agent.py`. `Plan this load` is not shown anywhere.
+- Known wording issue to decide: scene 8 narration (verbatim from the brief) says the reply "lists every one with its source". The real reply names the basis (e.g. "Haryana market fee plus RDF") but the named sources (Business Standard/CMIE, Tribune, NABCONS) are in SOURCES.md, not in the reply text. Suggested fix: "and the repo lists every one with its source" (re-run `make_vo.py`, `build_comp.py`, render).
+
 ## Session log (newest first)
+- 2026-10-25 (~01:15): SCREEN-RECORDED DEMO VIDEO BUILT (`video-output/demo.mp4`, about 4:44) from the screen-record brief; agents were restarted at 22:52 (PC sleep killed them); deadline is now 10:00 AM Sun 25 Oct (mail 22:52). No code changed. See "Screen-recorded demo video".
+- 2026-10-24 (~16:40): VIDEO BUILT with /brag (see "Demo video" above). 11 scenes, 255 s, Hyperframes check 0 errors, contrast 89/89. Nothing in the code changed. Still to do by Laksh: watch it through, upload it for Devpost, decide the scene 8 wording above, optionally add real screen clips to `assets/clips/` for scenes 3 and 7.
 - 2026-10-24 (~16:20): README redesigned and checked on the live GitHub page: centered hero + badge row + nav links, at-a-glance 3-column block, answer image (assets/example-answer.png, re-created from a real reply), branded architecture image (assets/architecture.png), agents as readable blocks with copyable addresses, collapsible Run and File map sections, NOTE and WARNING callouts. Required badge lines kept exactly at the top. Images are generated with Pillow (scripts live only in the session scratchpad; regenerate by hand if numbers change).
 - 2026-10-24 (~15:58): README reviewed against the hackpack and rewritten (submission links table, requirements map, bonus map, test-without-keys, key sources, mailbox connect steps, extra resources). FOUND: Agentverse agent READMEs lacked the Innovation Lab badges -> added docs/agent-readme-{front,price,logistics}.md + mandi/branding.py (readme, description, avatar, banner published from code). For a mailbox agent the profile is only pushed on /connect: re-ran POST /connect (key from .env); this REPLACED the hand-typed README (now badges render) and CLEARED starter prompts (re-added by hand). Agents restarted; end-to-end still works. NOTE: after any front-agent re-connect, re-add starter prompts. Helper agents' Agentverse profiles not re-checked after restart.
 - 2026-10-24 (~16:00): SUBMISSION DOCS written: README (agent table, how it works, run steps, limits), docs/writeup.md (Devpost text), docs/video-script.md (4 min script + pre-flight), docs/submission-checklist.md. STILL TO DO BY LAKSH: share the ASI:One chat publicly (his browser) and paste link; record + upload video; fill Devpost form; keep the three agent processes running.
@@ -85,12 +101,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 4:28 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 11:50 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `cd619e7` 2026-10-24 16:28 Add screen-recorded video brief (replaces the motion-graphics one)
 - `5e27d1b` 2026-10-24 16:24 README: list all three Agentverse profile links in the submission table
 - `e34e678` 2026-10-24 16:10 Soften restart note in checklist
 - `61bba0c` 2026-10-24 16:09 Add start and stop scripts for the three agents
@@ -105,12 +122,18 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
 - `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
 - `4d33d2c` 2026-10-24 15:11 Add offline fallbacks: saved price snapshot and estimated routes
-- `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
 
 ### Uncommitted changes at refresh time
 
 ```
-M  .gitignore
-A  docs/video-screen-record-prompt.md
+M  HANDOFF.md
+A  video-output/shotlist.md
+A  video-output/tools/build_final.py
+A  video-output/tools/build_shotlist.py
+A  video-output/tools/build_term_scenes.py
+A  video-output/tools/mux.ps1
+A  video-output/tools/place-window.ps1
+A  video-output/tools/term-run.ps1
+A  video-output/tools/tts.ps1
 ```
 <!-- handoff:auto:end -->

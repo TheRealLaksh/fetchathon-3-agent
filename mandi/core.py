@@ -74,12 +74,15 @@ def geocode(query: str) -> tuple | None:
         return tuple(cache[query]) if cache[query] else None
     hits = None
     for attempt in range(3):  # Nominatim rate-limits; back off and retry instead of caching a failure
-        r = httpx.get(
-            "https://nominatim.openstreetmap.org/search",
-            params={"q": query, "format": "json", "limit": 1, "countrycodes": "in"},
-            headers=UA,
-            timeout=20,
-        )
+        try:
+            r = httpx.get(
+                "https://nominatim.openstreetmap.org/search",
+                params={"q": query, "format": "json", "limit": 1, "countrycodes": "in"},
+                headers=UA,
+                timeout=20,
+            )
+        except httpx.HTTPError:
+            return None  # offline: places already in the cache still work, new ones are skipped
         time.sleep(1.1)
         if r.status_code == 200:
             hits = r.json()
@@ -118,6 +121,43 @@ def fetch_prices(commodity: str, state: str | None = None, limit: int = 200) -> 
             if attempt == 2:
                 raise
     return []
+
+
+SNAPSHOT_DIR = Path(__file__).with_name("snapshots")
+
+
+def fetch_prices_with_source(commodity: str, state: str | None = None, limit: int = 1000) -> tuple[list[dict], dict]:
+    """Live rows, also saved as a dated snapshot (history builds up day by day).
+
+    If the live API fails, fall back to the last saved snapshot and say so in the returned info dict.
+    """
+    slug = commodity.lower().replace(" ", "_")
+    try:
+        rows = fetch_prices(commodity, state, limit)
+    except Exception:
+        rows = None
+    if rows:
+        if state is None:  # only whole-crop fetches are saved, so a snapshot can serve any state later
+            payload = json.dumps({"fetched_at": time.strftime("%Y-%m-%d %H:%M:%S"), "rows": rows})
+            day_dir = SNAPSHOT_DIR / time.strftime("%Y-%m-%d")
+            day_dir.mkdir(parents=True, exist_ok=True)
+            (SNAPSHOT_DIR / f"{slug}.json").write_text(payload, encoding="utf-8")
+            (day_dir / f"{slug}.json").write_text(payload, encoding="utf-8")
+        return rows, {"source": "live", "fetched_at": None}
+    try:
+        snap = json.loads((SNAPSHOT_DIR / f"{slug}.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        raise RuntimeError("live prices are unavailable and there is no saved snapshot for this crop")
+    saved = snap["rows"]
+    if state:
+        saved = [r for r in saved if r["state"].lower() == state.lower()]
+    return saved, {"source": "snapshot", "fetched_at": snap["fetched_at"]}
+
+
+def estimate_route(a: tuple, b: tuple) -> tuple[float, float]:
+    """Offline fallback: straight-line distance x 1.3 for road winding, at an average 45 km/h."""
+    km = haversine_km(a, b) * 1.3
+    return km, km / 45.0
 
 
 def net_price(modal: float, distance_km: float, drive_hours: float, commodity: str, a: Assumptions) -> tuple:

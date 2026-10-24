@@ -18,13 +18,15 @@ class MandiRow(Model):
 class PriceRequest(Model):
     commodity: str
     states: List[str] = []  # empty = all states
-    limit: int = 500
+    limit: int = 1000
 
 
 class PriceReply(Model):
     commodity: str
     rows: List[MandiRow]
     error: Optional[str] = None
+    source: str = "live"  # "live", or "snapshot" when the government API was unreachable
+    fetched_at: Optional[str] = None  # when the snapshot was saved (snapshot only)
 
 
 class Place(Model):
@@ -53,4 +55,5 @@ class RouteReply(Model):
     origin_found: bool
     routes: List[RouteInfo]
     skipped: int = 0  # places we could not locate or that were outside the radius
+    estimated: int = 0  # routes estimated from straight-line distance because the routing service was down
     error: Optional[str] = None

@@ -6,7 +6,7 @@ import re
 from dotenv import load_dotenv
 from uagents import Agent, Context
 
-from mandi.core import geocode, haversine_km, road_route
+from mandi.core import estimate_route, geocode, haversine_km, road_route
 from mandi.models import RouteInfo, RouteReply, RouteRequest
 
 load_dotenv()
@@ -33,13 +33,18 @@ def compute(req: RouteRequest) -> RouteReply:
     origin = geocode(req.origin)
     if not origin:
         return RouteReply(origin=req.origin, origin_found=False, routes=[], error="Could not locate the origin")
-    routes, skipped = [], 0
+    routes, skipped, estimated = [], 0, 0
     for p in req.places:
         pos, approx = _locate(p)
         if not pos or haversine_km(origin, pos) > req.max_radius_km:
             skipped += 1
             continue
-        leg = road_route(origin, pos)
+        try:
+            leg = road_route(origin, pos)
+        except Exception:  # routing service unreachable: estimate instead of failing the whole answer
+            leg = estimate_route(origin, pos)
+            approx = True
+            estimated += 1
         if not leg:
             skipped += 1
             continue
@@ -47,7 +52,7 @@ def compute(req: RouteRequest) -> RouteReply:
             RouteInfo(market=p.market, district=p.district, state=p.state, distance_km=leg[0], drive_hours=leg[1],
                       approx=approx)
         )
-    return RouteReply(origin=req.origin, origin_found=True, routes=routes, skipped=skipped)
+    return RouteReply(origin=req.origin, origin_found=True, routes=routes, skipped=skipped, estimated=estimated)
 
 
 def make_logistics_agent(port: int = 8003, **kwargs) -> Agent:

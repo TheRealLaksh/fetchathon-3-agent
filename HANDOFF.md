@@ -80,12 +80,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:07 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:11 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
 - `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
 - `ff9211f` 2026-10-24 14:57 Add geocode cache warm-up script
 - `14869f9` 2026-10-24 14:55 Fix reply wording for buyer mode and plural; record profile setup
@@ -104,10 +105,14 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 ### Uncommitted changes at refresh time
 
 ```
-M  HANDOFF.md
-A  SOURCES.md
+M  .gitignore
 M  mandi/core.py
-M  mandi/front_agent.py
-M  mandi/ranking.py
+ M mandi/front_agent.py
+M  mandi/logistics_agent.py
+M  mandi/models.py
+M  mandi/price_agent.py
+M  mandi/warm_cache.py
+?? mandi/extras.py
+?? mandi/selftest.py
 ```
 <!-- handoff:auto:end -->

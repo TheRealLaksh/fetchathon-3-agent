@@ -8,7 +8,7 @@ import sys
 
 from dotenv import load_dotenv
 
-from mandi.core import fetch_prices
+from mandi.core import fetch_prices_with_source
 from mandi.front_agent import MAX_MARKETS
 from mandi.logistics_agent import compute
 from mandi.models import Place, RouteRequest
@@ -20,7 +20,7 @@ load_dotenv()
 def warm(commodity: str, origin: str) -> None:
     state = origin.rsplit(",", 1)[-1].strip()
     wanted = {s.lower() for s in search_states(state)}
-    rows = [r for r in fetch_prices(commodity, None, 500) if not wanted or r["state"].lower() in wanted]
+    rows = [r for r in fetch_prices_with_source(commodity, None)[0] if not wanted or r["state"].lower() in wanted]
     seen, places = set(), []
     for r in rows:  # same selection the front agent makes: unique markets in data order, capped
         key = (r["market"], r["district"], r["state"])

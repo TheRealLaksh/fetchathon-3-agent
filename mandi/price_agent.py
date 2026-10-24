@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from uagents import Agent, Context
 
-from mandi.core import fetch_prices
+from mandi.core import fetch_prices_with_source
 from mandi.models import MandiRow, PriceReply, PriceRequest
 
 load_dotenv()
@@ -17,7 +17,7 @@ def make_price_agent(port: int = 8002, **kwargs) -> Agent:
     @agent.on_message(PriceRequest, replies=PriceReply)
     async def handle(ctx: Context, sender: str, msg: PriceRequest):
         try:
-            rows = await asyncio.to_thread(fetch_prices, msg.commodity, None, msg.limit)
+            rows, info = await asyncio.to_thread(fetch_prices_with_source, msg.commodity, None, msg.limit)
             wanted = {s.lower() for s in msg.states}
             out = []
             for r in rows:
@@ -33,7 +33,8 @@ def make_price_agent(port: int = 8002, **kwargs) -> Agent:
                     )
                 except (KeyError, ValueError, TypeError):
                     continue  # skip rows with missing or non-numeric prices
-            await ctx.send(sender, PriceReply(commodity=msg.commodity, rows=out))
+            await ctx.send(sender, PriceReply(commodity=msg.commodity, rows=out, source=info["source"],
+                                              fetched_at=info["fetched_at"]))
         except Exception as err:  # keep the desk alive; the front agent reports the error
             ctx.logger.exception("price lookup failed")
             await ctx.send(sender, PriceReply(commodity=msg.commodity, rows=[], error=str(err)[:200]))

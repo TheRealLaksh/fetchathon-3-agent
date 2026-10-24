@@ -63,6 +63,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~15:50): Agentverse profile finished: avatar (assets/pfp.png) + banner (assets/banner.png) uploaded, handle @mandi-desk set, setup checklist complete. ASI:One still shows the old name/avatar 'ASI-agent' (its own cache; check again later). CARD TAP FINDINGS: ASI:One -> mailbox -> agent delivery takes ~1.5 min each way and the chat page needs a reload (20-90 s) to show replies, so an earlier 'tap did nothing' was probably me restarting the agent before the tap arrived (LAST list is in memory and lost on restart). Do NOT restart the front agent while testing. A tap in a chat whose 'To' is the ASI:One assistant may be routed to it instead of our agent (unconfirmed). After many reloads ASI:One showed a Loading screen with a reCAPTCHA (bot check): stop automated reloads; test the tap by hand. The agent logs every incoming message text ('incoming from ...') so the tap format can be read from the log.
 - 2026-10-24 (~15:30): added offline fallbacks (saved price snapshot, estimated routes), interactive card (custom card, "Plan this load" button per mandi), load planner (trucks, totals, optional spread across top 3), 9 offline self-tests (python -m mandi.selftest). VERIFIED: card renders in ASI:One; snapshot fallback works with a wrong API key; JSON card tap -> plan works locally (TAP=2 chat_test). NOT CONFIRMED: tapping the card in the ASI:One UI did not produce a plan within ~3 min (tap goes to ASI:One's planner, 'Submitted' shown, agent log shows nothing). Typed 'plan the load for <mandi>' is handled instead. 'Sell now vs wait' NOT built: data.gov.in API returns only today's rows (date filter ignored, verified), so no history; dated snapshots now accumulate in mandi/snapshots/ (gitignored). ASI:One chat view needs a page reload to show new agent messages (UI quirk).
 - 2026-10-24 (~16:15): assumptions now sourced (SOURCES.md): freight Rs 3.0/tonne-km, market fee 2% (Haryana 1%+1% RDF), agent commission 0% (not included, no reliable rate), transit loss 0.25/0.15/0.2 %/h (tomato/onion/other, derived from NABCONS 2022). Users can override in chat (truck rate, commission, market fee). Ranking order is insensitive to these (tested). Front agent restarted with mailbox on the new code. Unverified at primary source: NABCONS crop-by-stage tables, current Haryana commission schedule.
 - 2026-10-24 (~15:50): ran warm_cache for Tomato/Onion/Potato from Gurugram + Delhi (117 cache entries; file is gitignored, lives only on this laptop). A warm tomato question now answers in ~30 s including the test client start-up (was minutes cold). Potato, off-topic and onion buy/sell tests all passed.
@@ -81,12 +82,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:27 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 3:44 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `7b3ad1e` 2026-10-24 15:27 Handle ASI:One prose card taps and typed load-plan requests; extend tests
 - `1e97713` 2026-10-24 15:11 Add interactive card, load planner and offline self-tests
 - `4d33d2c` 2026-10-24 15:11 Add offline fallbacks: saved price snapshot and estimated routes
 - `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
@@ -101,15 +103,13 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
 - `a922855` 2026-10-24 00:30 Fix template: endpoint overrides mailbox, set only one
 - `6a322b4` 2026-10-24 00:01 Fix ASI:One API key URL and update handoff status
-- `9638ac5` 2026-10-24 00:01 Add working Sun-expert chat agent template (ASI:One compatible)
 
 ### Uncommitted changes at refresh time
 
 ```
 M  HANDOFF.md
-M  mandi/chat_test.py
-M  mandi/extras.py
+A  assets/banner.png
+A  assets/pfp.png
 M  mandi/front_agent.py
-M  mandi/selftest.py
 ```
 <!-- handoff:auto:end -->

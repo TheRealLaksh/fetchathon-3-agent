@@ -96,6 +96,7 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     text = "".join(i.text for i in msg.content if isinstance(i, TextContent)).strip()
 
     last = LAST.get(sender)
+    ctx.logger.info("incoming from %s: %r (have list: %s)", sender[:14], text[:400], bool(last))
     tapped = find_tap(text, last)  # a tap on a card's "Plan this load" button (JSON, or ASI:One's prose summary)
     if tapped is not None:
         await say(ctx, sender, plan_load(last["results"], tapped, last["quintals"], last["a"], last["mode"]),

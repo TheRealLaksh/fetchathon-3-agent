@@ -1,6 +1,7 @@
 """Logistics agent: answers RouteRequest with real road distance and drive time (OSM + OSRM)."""
 import asyncio
 import os
+import re
 
 from dotenv import load_dotenv
 from uagents import Agent, Context
@@ -11,11 +12,21 @@ from mandi.models import RouteInfo, RouteReply, RouteRequest
 load_dotenv()
 
 
-def _locate(place) -> tuple | None:
-    """Market first, then fall back to the district, so more rows get a position."""
-    return geocode(f"{place.market} mandi, {place.district}, {place.state}, India") or geocode(
-        f"{place.district}, {place.state}, India"
-    )
+def _clean(name: str) -> str:
+    """Strip words that stop OpenStreetMap matching: APMC, Mandi, brackets, stray commas."""
+    name = re.sub(r"\(.*?\)|\b(?:APMC|Mandi|Market|New Grain)\b|,", " ", name, flags=re.I)
+    return re.sub(r"\s+", " ", name).strip()
+
+
+def _locate(place) -> tuple[tuple | None, bool]:
+    """(position, approx). Market name first; falls back to the district centre (approx=True)."""
+    clean = _clean(place.market)
+    if clean:
+        pos = geocode(f"{clean}, {place.district}, {place.state}, India")
+        if pos:
+            return pos, False
+    pos = geocode(f"{place.district}, {place.state}, India")
+    return pos, True
 
 
 def compute(req: RouteRequest) -> RouteReply:
@@ -24,7 +35,7 @@ def compute(req: RouteRequest) -> RouteReply:
         return RouteReply(origin=req.origin, origin_found=False, routes=[], error="Could not locate the origin")
     routes, skipped = [], 0
     for p in req.places:
-        pos = _locate(p)
+        pos, approx = _locate(p)
         if not pos or haversine_km(origin, pos) > req.max_radius_km:
             skipped += 1
             continue
@@ -33,7 +44,8 @@ def compute(req: RouteRequest) -> RouteReply:
             skipped += 1
             continue
         routes.append(
-            RouteInfo(market=p.market, district=p.district, state=p.state, distance_km=leg[0], drive_hours=leg[1])
+            RouteInfo(market=p.market, district=p.district, state=p.state, distance_km=leg[0], drive_hours=leg[1],
+                      approx=approx)
         )
     return RouteReply(origin=req.origin, origin_found=True, routes=routes, skipped=skipped)
 

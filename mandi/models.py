@@ -45,6 +45,7 @@ class RouteInfo(Model):
     state: str
     distance_km: float  # real road distance (OSRM)
     drive_hours: float
+    approx: bool = False  # True when only the district centre could be located
 
 
 class RouteReply(Model):

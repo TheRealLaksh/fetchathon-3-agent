@@ -63,14 +63,21 @@ def geocode(query: str) -> tuple | None:
     cache = _load_cache()
     if query in cache:
         return tuple(cache[query]) if cache[query] else None
-    r = httpx.get(
-        "https://nominatim.openstreetmap.org/search",
-        params={"q": query, "format": "json", "limit": 1, "countrycodes": "in"},
-        headers=UA,
-        timeout=20,
-    )
-    time.sleep(1.1)
-    hits = r.json() if r.status_code == 200 else []
+    hits = None
+    for attempt in range(3):  # Nominatim rate-limits; back off and retry instead of caching a failure
+        r = httpx.get(
+            "https://nominatim.openstreetmap.org/search",
+            params={"q": query, "format": "json", "limit": 1, "countrycodes": "in"},
+            headers=UA,
+            timeout=20,
+        )
+        time.sleep(1.1)
+        if r.status_code == 200:
+            hits = r.json()
+            break
+        time.sleep(3 * (attempt + 1))
+    if hits is None:
+        return None  # lookup failed: do not cache, so a later call can retry
     cache[query] = [float(hits[0]["lat"]), float(hits[0]["lon"])] if hits else None
     GEO_CACHE.write_text(json.dumps(cache), encoding="utf-8")
     return tuple(cache[query]) if cache[query] else None

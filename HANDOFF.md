@@ -22,6 +22,7 @@ python <agent>.py
 Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat with Agent" in ASI:One. A mailbox agent only works while the script runs.
 
 ## Code map
+- `mandi/front_agent.py` (port 8001, ASI:One chat protocol, same seed as the earlier test agent so the existing mailbox works), `mandi/ranking.py` (net-price ranking + reply text + neighbour-state map), `mandi/chat_test.py` (chat client for local tests: `python -m mandi.chat_test "question"`). Full local chain tested 24 Oct: real tomato prices + real routes -> ranked table (Sohna 18 km best, Rs 2,443/qtl net).
 - `mandi/models.py`, `mandi/price_agent.py` (port 8002), `mandi/logistics_agent.py` (port 8003): the two real uAgents (agent-to-agent messages). Run each with `python -m mandi.price_agent` etc.; `python -m mandi.local_test` is a client that exercises both. TESTED 24 Oct: 23 real Haryana tomato rows, real road distances from Gurugram (Faridabad 37.8 km, Narnaul 111.6 km).
 - `mandi/core.py`: Mandi desk maths + data calls (data.gov.in prices, Nominatim geocode, OSRM route, `net_price`). Keyless parts tested live 24 Oct. Assumptions (truck rate, spoilage, commission) are labelled placeholders.
 - `README.md`: public README with the two required badges; agent name/address table to fill in.
@@ -60,6 +61,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~14:50): built front agent (LLM intent extraction, calls Price + Logistics agents, ranks, replies); fixed geocode caching of failed lookups (only cache real answers) and the market-name cleaner; district-centre fallbacks are shown with ~. Gotcha: writing regex with backslash-b through a bash heredoc turned it into a backspace char; write it via a file using chr(92).
 - 2026-10-24 (~15:00): built and tested Price + Logistics agents as separate processes (client test passes). Gotchas: Bureau did not fire handlers here, use separate processes with explicit endpoint; agent ctx.storage persists across runs (use in-memory flags in tests); python -u needed for logs when redirecting.
 - 2026-10-24 (~14:30): generated data.gov.in key in Laksh's logged-in Chrome (copied via clipboard to .env, never printed); confirmed fresh mandi rows for 5 crops; added retry to fetch_prices.
 - 2026-10-24 (~14:00): project locked (Mandi Net-Price Desk); added mandi/core.py (geocode, OSRM route, net-price maths) tested live without the data key.
@@ -71,12 +73,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 2:31 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 2:49 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
 - `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
 - `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
 - `70cca5b` 2026-10-24 00:52 Handoff: ASI:One chat leg verified end to end, test agent stopped
@@ -90,9 +93,11 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ```
 M  HANDOFF.md
-A  mandi/local_test.py
-A  mandi/logistics_agent.py
-A  mandi/models.py
-A  mandi/price_agent.py
+A  mandi/chat_test.py
+M  mandi/core.py
+A  mandi/front_agent.py
+M  mandi/logistics_agent.py
+M  mandi/models.py
+A  mandi/ranking.py
 ```
 <!-- handoff:auto:end -->

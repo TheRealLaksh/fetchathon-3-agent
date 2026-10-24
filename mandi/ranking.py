@@ -91,7 +91,10 @@ def format_reply(results: list[Result], commodity: str, origin: str, mode: str, 
     buy = mode == "buy"
     best = results[0]
     by_sticker = sorted(results, key=lambda r: r.modal_price, reverse=not buy)[0]
-    head = f"**{commodity}: best mandi to {'buy from' if buy else 'sell at'} from {origin}, based on today's real prices**\n"
+    if buy:
+        head = f"**{commodity}: cheapest mandi to buy from, for a buyer in {origin} (today's real prices)**\n"
+    else:
+        head = f"**{commodity}: best mandi to sell at from {origin} (today's real prices)**\n"
     lines = [head]
     col = "You pay (landed)" if buy else "You actually clear"
     lines.append(f"| # | Mandi | Price Rs/qtl | Road km | Drive h | {col} Rs/qtl |")
@@ -117,5 +120,5 @@ def format_reply(results: list[Result], commodity: str, origin: str, mode: str, 
     if any(r.approx for r in results[:top]):
         lines.append("_~ means the mandi's exact spot was not found, so the district centre was used (distance approximate)._")
     if skipped:
-        lines.append(f"_{skipped} markets were skipped (outside {a.max_radius_km:.0f} km or could not be located)._")
+        lines.append(f"_{skipped} {'market was' if skipped == 1 else 'markets were'} skipped (outside {a.max_radius_km:.0f} km or could not be located)._")
     return "\n".join(lines)

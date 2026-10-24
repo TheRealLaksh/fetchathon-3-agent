@@ -25,6 +25,7 @@ from uagents_core.contrib.protocols.chat import (
 )
 
 from mandi.core import Assumptions
+from mandi.extras import build_card_payload, card_message, parse_selection, plan_load
 from mandi.models import Place, PriceReply, PriceRequest, RouteReply, RouteRequest
 from mandi.ranking import ADJACENT, format_reply, rank, search_states
 
@@ -35,6 +36,7 @@ PRICE = Identity.from_seed(SEED + "-price", 0).address
 LOGISTICS = Identity.from_seed(SEED + "-logistics", 0).address
 USE_MAILBOX = os.environ.get("USE_MAILBOX") == "1"
 MAX_MARKETS = 30  # geocoding is rate-limited (1/s); results are cached on disk after the first run
+LAST: dict = {}  # sender -> last ranking, so a tap on a card button can be answered (lost on restart)
 
 llm = OpenAI(base_url="https://api.asi1.ai/v1", api_key=os.environ["ASI1_API_KEY"])
 STATE_NAMES = ", ".join(sorted(set(ADJACENT) | {s for v in ADJACENT.values() for s in v} - {"Delhi"}))
@@ -92,6 +94,20 @@ async def say(ctx: Context, to: str, text: str, end: bool = False):
 async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
     await ctx.send(sender, ChatAcknowledgement(acknowledged_msg_id=msg.msg_id))
     text = "".join(i.text for i in msg.content if isinstance(i, TextContent)).strip()
+
+    sel = parse_selection(text)  # a tap on a card's "Plan this load" button
+    if sel:
+        last = LAST.get(sender)
+        idx = sel.get("rank")
+        if (last and isinstance(idx, int) and 0 <= idx < len(last["results"])
+                and last["results"][idx].market == sel.get("market")):
+            await say(ctx, sender, plan_load(last["results"], idx, last["quintals"], last["a"], last["mode"]),
+                      end=True)
+        else:
+            await say(ctx, sender, "That list has expired. Ask me again, for example: "
+                                   "*I have 8 tonnes of tomato in Gurugram. Where should I sell today?*", end=True)
+        return
+
     try:
         req = await asyncio.to_thread(parse_request, text)
     except Exception:
@@ -146,8 +162,18 @@ async def handle_message(ctx: Context, sender: str, msg: ChatMessage):
         return
 
     results = rank(prices.rows, routes.routes, commodity, mode, a)
-    await say(ctx, sender, format_reply(results, commodity, origin, mode, req.get("quantity_quintals"), a,
-                                        routes.skipped), end=True)
+    qty = req.get("quantity_quintals") if isinstance(req.get("quantity_quintals"), (int, float)) else None
+    body = format_reply(results, commodity, origin, mode, qty, a, routes.skipped)
+    if prices.source == "snapshot":
+        body += (f"\n_Live government prices were unreachable, so this uses the last saved snapshot "
+                 f"({prices.fetched_at}). Treat it as possibly stale._")
+    if routes.estimated:
+        body += (f"\n_The routing service was unreachable for {routes.estimated} markets, so their distances "
+                 "are straight-line estimates._")
+    LAST[sender] = {"results": results, "quantity": qty, "quintals": qty, "a": a, "mode": mode}
+    # Full table as text (also the fallback if a client cannot draw cards), plus the interactive card.
+    await ctx.send(sender, card_message(body + "\n\nTap **Plan this load** on a mandi below for trucks and totals.",
+                                        build_card_payload(results, commodity, origin, mode, qty)))
 
 
 @protocol.on_message(ChatAcknowledgement)

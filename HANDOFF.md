@@ -86,6 +86,7 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `4d33d2c` 2026-10-24 15:11 Add offline fallbacks: saved price snapshot and estimated routes
 - `9240ef3` 2026-10-24 15:07 Source the cost assumptions, add chat overrides and SOURCES.md
 - `9d98aeb` 2026-10-24 15:02 Record cache warm-up and test results
 - `ff9211f` 2026-10-24 14:57 Add geocode cache warm-up script
@@ -100,19 +101,12 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `6a322b4` 2026-10-24 00:01 Fix ASI:One API key URL and update handoff status
 - `9638ac5` 2026-10-24 00:01 Add working Sun-expert chat agent template (ASI:One compatible)
 - `c8f0006` 2026-10-23 23:56 Add HANDOFF.md and its automation (stop hook, pre-commit refresh)
-- `fe9ea20` 2026-10-23 23:56 Add README with required badges, gitignore, env example and requirements
 
 ### Uncommitted changes at refresh time
 
 ```
-M  .gitignore
-M  mandi/core.py
- M mandi/front_agent.py
-M  mandi/logistics_agent.py
-M  mandi/models.py
-M  mandi/price_agent.py
-M  mandi/warm_cache.py
-?? mandi/extras.py
-?? mandi/selftest.py
+A  mandi/extras.py
+M  mandi/front_agent.py
+A  mandi/selftest.py
 ```
 <!-- handoff:auto:end -->

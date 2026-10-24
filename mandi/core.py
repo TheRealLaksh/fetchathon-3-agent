@@ -93,9 +93,15 @@ def fetch_prices(commodity: str, state: str | None = None, limit: int = 200) -> 
     params = {"api-key": key, "format": "json", "limit": limit, "filters[commodity]": commodity}
     if state:
         params["filters[state]"] = state
-    r = httpx.get(f"https://api.data.gov.in/resource/{MANDI_RESOURCE}", params=params, headers=UA, timeout=40)
-    r.raise_for_status()
-    return r.json().get("records", [])
+    for attempt in range(3):  # the API sometimes times out; retry before giving up
+        try:
+            r = httpx.get(f"https://api.data.gov.in/resource/{MANDI_RESOURCE}", params=params, headers=UA, timeout=40)
+            r.raise_for_status()
+            return r.json().get("records", [])
+        except httpx.TimeoutException:
+            if attempt == 2:
+                raise
+    return []
 
 
 def net_price(modal: float, distance_km: float, drive_hours: float, commodity: str, a: Assumptions) -> tuple:

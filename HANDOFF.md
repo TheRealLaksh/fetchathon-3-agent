@@ -43,7 +43,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - ASI:One key page is asi1.ai/platform/developer (docs link /dashboard/api-keys 404s). Key names allow only letters, numbers, spaces.
 
 ## Next steps (in order)
-0. MANDI DESK: Laksh gets a free data.gov.in API key (DATA_GOV_IN_API_KEY in .env; the shared sample key is rate-limited); confirm which crops have fresh rows; build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
+0. MANDI DESK: data.gov.in key is in .env (done 24 Oct). Verified fresh rows dated 24/10/2026 for Tomato, Onion, Potato, Banana, Cauliflower (Tamil Nadu has most rows; Haryana/Punjab 12-24 each; Apple timed out once). Fields: arrival_date, commodity, district, grade, market, max_price, min_price, modal_price, state, variety. Next: build Price agent + Logistics agent as real uAgents, front agent on ASI:One, card output; freeze 15:30. Fallback if data fails: landed-cost desk (Frankfurter FX verified).
 1. Join Discord (channel Fetch-A-Thon 3.0) and agree roles with teammates.
 2. On the day: decide the project after the 10:15 brief, build from `examples/sun_expert_agent.py`, submit by 16:30 to 17:50 (GitHub repo, Agentverse profile URL(s), public ASI:One chat URL, 3 to 5 min video, write-up, via Devpost).
 3. Add the real agent's name/address to the README table; keep the two badges.
@@ -59,6 +59,7 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 - Commit small and push each one (Laksh said yes, 23 Oct 2026).
 
 ## Session log (newest first)
+- 2026-10-24 (~14:30): generated data.gov.in key in Laksh's logged-in Chrome (copied via clipboard to .env, never printed); confirmed fresh mandi rows for 5 crops; added retry to fetch_prices.
 - 2026-10-24 (~14:00): project locked (Mandi Net-Price Desk); added mandi/core.py (geocode, OSRM route, net-price maths) tested live without the data key.
 - 2026-10-24 (~01:00): Laksh confirmed the ASI:One -> agent chat works (screenshot); stopped the test agent; handoff updated.
 - 2026-10-24 (00:30 to 01:10): created Agentverse key into `.env`; fixed template (endpoint vs mailbox); connected mailbox via `/connect`; agent shows Active + ASI Available on Agentverse. ASI:One chat test blocked by signed-out ASI:One in the automation browser.

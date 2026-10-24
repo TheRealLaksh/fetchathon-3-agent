@@ -84,12 +84,13 @@ Mailbox agent: open the Inspector link it prints, Connect, Mailbox, then "Chat w
 <!-- handoff:auto:start -->
 ## Auto: repo state
 
-_Refreshed 24 Oct 2026, 3:56 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
+_Refreshed 24 Oct 2026, 4:05 pm IST by `scripts/handoff.mjs` (runs on every commit). Don't edit inside this block._
 
 Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 
 ### Last 15 commits
 
+- `92901b9` 2026-10-24 15:56 README review fixes: badges in agent READMEs, run and test steps, submission links
 - `8c8da6f` 2026-10-24 15:50 Add detailed video brief for the /brag session
 - `1117198` 2026-10-24 15:47 Add submission docs: README, write-up, video script, checklist
 - `62ce375` 2026-10-24 15:44 Add profile picture and banner, log incoming messages, record card-tap findings
@@ -104,19 +105,11 @@ Branch: `main` · remote: https://github.com/TheRealLaksh/fetchathon-3-agent.git
 - `5551520` 2026-10-24 14:49 Add front ASI:One agent, net-price ranking and chat test; fix geocode caching
 - `9dae140` 2026-10-24 14:31 Add Price and Logistics agents with local end-to-end test
 - `70468d9` 2026-10-24 14:21 Retry mandi price fetch on timeout; record verified fresh data
-- `0b87896` 2026-10-24 14:04 Add Mandi Net-Price Desk core: geocode, OSRM route, net-price maths
 
 ### Uncommitted changes at refresh time
 
 ```
-M  HANDOFF.md
 M  README.md
-A  docs/agent-readme-front.md
-A  docs/agent-readme-logistics.md
-A  docs/agent-readme-price.md
-A  mandi/branding.py
-M  mandi/front_agent.py
-M  mandi/logistics_agent.py
-M  mandi/price_agent.py
+A  assets/example-answer.png
 ```
 <!-- handoff:auto:end -->
